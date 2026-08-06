@@ -13,7 +13,7 @@ export default function SignUpPage() {
         <Link href="/" className="absolute -top-12 left-0 text-sm font-semibold text-gray-400 hover:text-white transition-colors">
           ← Back to Home
         </Link>
-        <CustomAuthModal initialMode="sign-up" onClose={() => {}} />
+        <CustomAuthModal initialMode="sign-up" />
       </div>
     </div>
   );

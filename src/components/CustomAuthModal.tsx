@@ -3,13 +3,13 @@
 import React, { useState } from 'react';
 import { useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-import type { OAuthStrategy } from '@clerk/types';
+export type OAuthStrategy = 'oauth_google' | 'oauth_discord' | 'oauth_github' | string;
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 interface CustomAuthModalProps {
   initialMode: 'sign-in' | 'sign-up';
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export default function CustomAuthModal({ initialMode, onClose }: CustomAuthModalProps) {
