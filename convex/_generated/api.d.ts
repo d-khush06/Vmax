@@ -9,6 +9,7 @@
  */
 
 import type * as calendar from "../calendar.js";
+import type * as files from "../files.js";
 import type * as kanban from "../kanban.js";
 import type * as messages from "../messages.js";
 import type * as teams from "../teams.js";
@@ -21,6 +22,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   calendar: typeof calendar;
+  files: typeof files;
   kanban: typeof kanban;
   messages: typeof messages;
   teams: typeof teams;

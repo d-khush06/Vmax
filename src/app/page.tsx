@@ -69,7 +69,7 @@ export default function LandingPage() {
         <div className="flex items-center gap-3">
           {isSignedIn ? (
             <Link
-              href="/kanban"
+              href="/tasks"
               className="text-sm font-semibold px-5 py-2.5 rounded-full bg-gradient-to-r from-orange-500 to-purple-600 text-white shadow-lg shadow-orange-500/25 hover:shadow-orange-500/40 transition-shadow"
             >
               Open Dashboard →

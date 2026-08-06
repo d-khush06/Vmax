@@ -37,7 +37,7 @@ function SetupContent() {
     // If they already have a team, we aren't explicitly holding them on success screen, 
     // and they haven't explicitly requested to add a new workspace via ?action=add
     if (myTeams && myTeams.length > 0 && mode !== 'success' && !isAddAction) {
-      router.push('/kanban');
+      router.push('/tasks');
     }
   }, [isLoaded, user, myTeams, router, mode, isAddAction]);
 
@@ -78,7 +78,7 @@ function SetupContent() {
         clerkEmail: user?.emailAddresses?.[0]?.emailAddress || '',
         clerkAvatar: user?.imageUrl || ''
       });
-      router.push('/kanban');
+      router.push('/tasks');
     } catch (err: any) {
       setError(err.message || 'Failed to join team.');
     } finally {
@@ -156,7 +156,7 @@ function SetupContent() {
             <button 
                 onClick={() => {
                   if (isAddAction) {
-                    router.push('/kanban');
+                    router.push('/tasks');
                   } else {
                     signOut();
                     router.push('/login');
@@ -233,7 +233,7 @@ function SetupContent() {
              </div>
 
              <button 
-                onClick={() => router.push('/kanban')}
+                onClick={() => router.push('/tasks')}
                 className="w-full bg-white/10 hover:bg-white/15 text-white font-semibold py-4 rounded-xl transition-all shadow-lg"
              >
                 Continue to Dashboard &rarr;

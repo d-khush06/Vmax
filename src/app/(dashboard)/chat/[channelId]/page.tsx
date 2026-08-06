@@ -44,20 +44,27 @@ export default function ChatPage() {
             <p>No messages yet. Start the conversation!</p>
           </div>
         ) : (
-          messages.map((msg: any, i: number) => (
-            <div key={msg._id} className="flex gap-4">
-              <img src={msg.users?.avatar_url || `https://i.pravatar.cc/150?u=${i}`} alt="Avatar" className="w-10 h-10 rounded-full border border-white/10" />
-              <div className="flex flex-col">
-                <div className="flex items-baseline gap-2">
-                  <span className="font-medium text-indigo-300">{msg.users?.full_name || 'Member'}</span>
-                  <span className="text-xs text-gray-500">{new Date(msg.created_at).toLocaleTimeString()}</span>
+          messages.map((msg: any, i: number) => {
+            const isMe = msg.users?.clerkId === user?.id;
+            return (
+              <div key={msg._id} className={`flex gap-4 ${isMe ? 'flex-row-reverse' : ''}`}>
+                <img src={msg.users?.avatar_url || `https://i.pravatar.cc/150?u=${i}`} alt="Avatar" className="w-10 h-10 rounded-full border border-white/10" />
+                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+                  <div className="flex items-baseline gap-2">
+                    <span className={`font-medium ${isMe ? 'text-orange-300' : 'text-indigo-300'}`}>{isMe ? 'You' : (msg.users?.full_name || 'Member')}</span>
+                    <span className="text-xs text-gray-500">{new Date(msg.created_at).toLocaleTimeString()}</span>
+                  </div>
+                  <p className={`px-4 py-2 mt-1 shadow-sm max-w-[85%] ${
+                    isMe 
+                      ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl rounded-tr-sm' 
+                      : 'bg-white/5 text-gray-300 rounded-2xl rounded-tl-sm border border-white/5'
+                  }`}>
+                    {msg.content}
+                  </p>
                 </div>
-                <p className="text-gray-300 bg-white/5 px-4 py-2 rounded-2xl rounded-tl-sm mt-1 border border-white/5 shadow-sm">
-                  {msg.content}
-                </p>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
 

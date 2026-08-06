@@ -45,4 +45,13 @@ export default defineSchema({
     startTime: v.string(), // ISO String
     endTime: v.string(), // ISO String
   }).index("by_team", ["teamId"]),
+
+  files: defineTable({
+    teamId: v.id("teams"),
+    userId: v.id("users"),
+    storageId: v.id("_storage"),
+    name: v.string(),
+    size: v.number(),
+    type: v.string(), // e.g. "image/png", "application/pdf"
+  }).index("by_team", ["teamId"]),
 });

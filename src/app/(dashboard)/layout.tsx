@@ -22,7 +22,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
     { name: 'Voice', icon: Mic, href: '/voice/general-voice' },
     { name: 'Files', icon: Folder, href: '/files' },
     { name: 'Calendar', icon: Calendar, href: '/calendar' },
-    { name: 'Tasks', icon: Kanban, href: '/kanban' },
+    { name: 'Tasks', icon: Kanban, href: '/tasks' },
     { name: 'Whiteboard', icon: Monitor, href: '/whiteboard' },
   ];
 

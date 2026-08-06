@@ -21,6 +21,7 @@ export const list = query({
           users: {
             full_name: user?.name,
             avatar_url: user?.avatarUrl,
+            clerkId: user?.tokenIdentifier,
           },
           created_at: msg._creationTime
         };
