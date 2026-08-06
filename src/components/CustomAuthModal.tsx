@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useClerk } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
-export type OAuthStrategy = 'oauth_google' | 'oauth_discord' | 'oauth_github' | string;
+export type OAuthStrategy = 'oauth_google' | 'oauth_discord' | 'oauth_github';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Mail, Lock, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
