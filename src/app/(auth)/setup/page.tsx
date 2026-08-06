@@ -1,13 +1,13 @@
 "use client"
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2, Users, Plus, ArrowRight, Copy, CheckCircle2 } from 'lucide-react';
 import { useUser, useClerk } from '@clerk/nextjs';
 import { useMutation, useQuery } from 'convex/react';
 import { api } from '../../../../convex/_generated/api';
 
-export default function SetupPage() {
+function SetupContent() {
   const { user, isLoaded } = useUser();
   const { signOut } = useClerk();
   const router = useRouter();
@@ -282,5 +282,17 @@ export default function SetupPage() {
 
       </div>
     </div>
+  );
+}
+
+export default function SetupPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen w-screen bg-[#030303] flex items-center justify-center">
+         <Loader2 className="w-8 h-8 animate-spin text-orange-500" />
+      </div>
+    }>
+      <SetupContent />
+    </Suspense>
   );
 }
