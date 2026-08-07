@@ -88,28 +88,38 @@ function CustomVoiceUI({ roomName }: { roomName: string }) {
              </div>
            </div>
         ) : (
-          <div className="grid gap-4 w-full h-full" style={{
+          <div className="grid gap-4 w-full h-full p-4" style={{
             gridTemplateColumns: `repeat(auto-fit, minmax(280px, 1fr))`,
             gridAutoRows: '1fr'
           }}>
-            {tracks.map((track) => (
-              <div key={track.participant.identity + track.source} className="rounded-2xl overflow-hidden border border-white/10 shadow-2xl bg-black relative group transition-all hover:border-white/20">
-                <ParticipantTile 
-                  trackRef={track}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-            ))}
+            {tracks.map((track) => {
+              const isSpeaking = track.participant.isSpeaking;
+              return (
+                <div 
+                  key={track.participant.identity + track.source} 
+                  className={`rounded-3xl overflow-hidden shadow-2xl bg-black relative group transition-all duration-300 ${isSpeaking ? 'border-2 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.4)] scale-[1.02]' : 'border border-white/10 hover:border-white/20'}`}
+                >
+                  <ParticipantTile 
+                    trackRef={track}
+                    className="w-full h-full object-cover"
+                  />
+                  {/* Speaker Indicator */}
+                  <div className={`absolute bottom-4 left-4 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${isSpeaking ? 'bg-green-500/80 text-white' : 'bg-black/50 text-gray-400 opacity-0 group-hover:opacity-100'}`}>
+                    {isSpeaking ? <Mic size={14} className="animate-pulse" /> : <MicOff size={14} />}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         )}
       </div>
 
-      <div className="h-24 border-t border-white/5 bg-white/[0.01] flex items-center justify-center gap-4 px-6 shrink-0">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 px-6 py-4 rounded-3xl bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50">
         <MicToggle />
         <CameraToggle />
         <ScreenShareToggle />
         
-        <DisconnectButton className="!w-auto !px-6 !h-14 !rounded-2xl !bg-red-500 hover:!bg-red-600 !border-0 !text-white flex items-center justify-center transition-all ml-4 gap-2 font-bold shadow-lg shadow-red-500/20">
+        <DisconnectButton className="!w-auto !px-6 !h-14 !rounded-2xl !bg-red-500 hover:!bg-red-600 !border-0 !text-white flex items-center justify-center transition-all ml-4 gap-2 font-bold shadow-lg shadow-red-500/20 transform hover:-translate-y-1">
           <PhoneOff size={20} />
           <span>Leave</span>
         </DisconnectButton>

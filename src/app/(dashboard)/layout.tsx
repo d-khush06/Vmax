@@ -60,12 +60,24 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
   return (
     <div className="relative flex h-screen w-full bg-[#030303] text-gray-100 overflow-hidden font-sans">
       
-      {/* 1. Ambient Celestial Background */}
+      {/* 1. Ambient Celestial Background - Animated & Upgraded */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-[20%] left-1/2 -translate-x-1/2 w-[60vw] h-[40vw] rounded-[100%] bg-gradient-to-b from-[#ff8a00]/30 via-[#e52e71]/10 to-transparent blur-[100px]" />
-        <div className="absolute top-[10%] left-[20%] w-[20vw] h-[20vw] rounded-full bg-purple-500/10 blur-[120px]" />
-        <div className="absolute top-[10%] right-[20%] w-[20vw] h-[20vw] rounded-full bg-orange-500/10 blur-[120px]" />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.03] mix-blend-overlay"></div>
+        <motion.div 
+          animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
+          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
+          className="absolute -top-[30%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-purple-600/10 to-indigo-900/20 blur-[120px]" 
+        />
+        <motion.div 
+          animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
+          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute top-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tr from-blue-500/10 to-cyan-400/5 blur-[100px]" 
+        />
+        <motion.div 
+          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          className="absolute bottom-[-20%] left-[30%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-t from-orange-500/10 via-rose-500/5 to-transparent blur-[130px]" 
+        />
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04] mix-blend-overlay"></div>
       </div>
 
       {/* App Container */}
@@ -190,13 +202,20 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                </AnimatePresence>
             </div>
 
-            <div className="flex-1 flex flex-col gap-1 px-3 overflow-y-auto hide-scrollbar">
+            <div className="flex-1 flex flex-col gap-2 px-3 mt-4 overflow-y-auto hide-scrollbar">
               {dockApps.map((app) => {
                 const isActive = pathname?.includes(app.href);
                 return (
-                  <Link key={app.name} href={app.href}>
-                    <div className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-colors ${isActive ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/5 hover:text-gray-200'}`}>
-                      <app.icon size={18} className="shrink-0" />
+                  <Link key={app.name} href={app.href} className="relative group">
+                    {isActive && (
+                      <motion.div 
+                        layoutId="activeTab" 
+                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-xl border border-white/10" 
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                    <div className={`relative z-10 flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ${isActive ? 'text-white shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-gray-400 group-hover:bg-white/5 group-hover:text-gray-200'}`}>
+                      <app.icon size={18} className={`shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'group-hover:scale-110'}`} />
                       <AnimatePresence>
                         {isSidebarOpen && (
                           <motion.div 
@@ -205,7 +224,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                             exit={{ opacity: 0, width: 0 }}
                             className="overflow-hidden whitespace-nowrap flex-1"
                           >
-                            <span className="font-medium text-sm">{app.name}</span>
+                            <span className={`text-sm ${isActive ? 'font-bold tracking-wide' : 'font-medium'}`}>{app.name}</span>
                           </motion.div>
                         )}
                       </AnimatePresence>
