@@ -7,42 +7,43 @@ import 'tldraw/tldraw.css';
 import { useTeam } from '@/lib/team-context';
 import { Share2, Download, MousePointer2 } from 'lucide-react';
 
-const Tldraw = dynamic(() => import('tldraw').then(mod => mod.Tldraw), { ssr: false });
+const SyncedWhiteboard = dynamic(() => import('@/components/SyncedWhiteboard'), { ssr: false });
 
 export default function WhiteboardPage() {
   const { team } = useTeam();
 
   return (
-    <div className="h-full w-full flex flex-col p-6 bg-gradient-to-br from-[#030303] to-[#0a0a0c] overflow-hidden relative">
-      {/* Background Glow */}
-      <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-purple-500/10 blur-[130px] rounded-full pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-orange-500/5 blur-[130px] rounded-full pointer-events-none" />
+    <div className="h-full w-full flex flex-col p-6 relative overflow-hidden">
+      {/* Ambient Glass Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
+        <div className="absolute top-0 right-0 w-[40vw] h-[40vw] bg-teal-500/10 blur-[130px] rounded-full" />
+        <div className="absolute bottom-0 left-0 w-[40vw] h-[40vw] bg-blue-500/5 blur-[120px] rounded-full" />
+      </div>
 
-      <header className="mb-6 px-2 flex items-center justify-between relative z-10">
+      <header className="mb-6 px-4 py-3 flex items-center justify-between relative z-10 bg-white/[0.01] backdrop-blur-xl border border-white/5 rounded-2xl shadow-lg">
         <div>
-          <h2 className="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-rose-500/20 to-purple-600/20 border border-rose-500/20 flex items-center justify-center">
-              <MousePointer2 size={20} className="text-rose-400" />
+          <h2 className="text-2xl font-bold text-gray-200 tracking-tight flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-teal-500/10 border border-teal-500/20 flex items-center justify-center">
+              <MousePointer2 size={16} className="text-teal-400" />
             </div>
             Team Whiteboard
           </h2>
-          <p className="text-gray-400 text-sm mt-1 ml-13">Shared canvas for {team?.name || 'your workspace'}. <span className="text-rose-400 font-medium">Local mode</span></p>
+          <p className="text-gray-500 text-xs mt-1 ml-11">Shared canvas for {team?.name || 'your workspace'}. <span className="text-teal-400 font-medium">Live Real-time</span></p>
         </div>
         <div className="flex items-center gap-3">
-          <button className="px-4 py-2 rounded-xl bg-white/5 border border-white/10 text-white font-medium text-sm hover:bg-white/10 transition-all flex items-center gap-2 shadow-lg">
+          <button className="px-4 py-2 rounded-lg bg-white/5 border border-white/10 text-gray-300 font-medium text-sm hover:bg-white/10 hover:text-white transition-all flex items-center gap-2">
             <Download size={16} /> Export
           </button>
-          <button className="px-4 py-2 rounded-xl bg-gradient-to-r from-rose-500 to-purple-600 text-white font-medium text-sm hover:from-rose-400 hover:to-purple-500 transition-all flex items-center gap-2 shadow-[0_0_20px_rgba(225,29,72,0.3)]">
+          <button className="px-4 py-2 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-medium text-sm transition-all flex items-center gap-2 shadow-[0_0_15px_rgba(20,184,166,0.3)]">
             <Share2 size={16} /> Share Session
           </button>
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden bg-[#121212] rounded-3xl border border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)] relative z-10 group">
-        <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700 shadow-[inset_0_0_100px_rgba(255,255,255,0.02)]" />
+      <div className="flex-1 overflow-hidden bg-white/[0.02] backdrop-blur-sm rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative z-10 group">
         <div className="absolute inset-0">
-          <Tldraw 
-            persistenceKey={`vmax-whiteboard-${team?._id || 'default'}`}
+          <SyncedWhiteboard 
+            roomId={`vmax-whiteboard-${team?._id || 'default'}`}
           />
         </div>
       </div>

@@ -4,8 +4,6 @@ import { mutation, query } from "./_generated/server";
 export const generateUploadUrl = mutation({
   args: {},
   handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Unauthenticated");
     return await ctx.storage.generateUploadUrl();
   },
 });
@@ -24,10 +22,16 @@ export const saveFile = mutation({
     const subject = identity?.subject || args.clerkId;
     if (!subject) throw new Error("Unauthenticated");
 
-    const user = await ctx.db
+    let user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) => q.eq("tokenIdentifier", subject))
       .first();
+
+    if (!user && args.clerkId) {
+      // Fallback: search for user where tokenIdentifier includes clerkId
+      const allUsers = await ctx.db.query("users").collect();
+      user = allUsers.find(u => u.tokenIdentifier.includes(args.clerkId!)) || null;
+    }
 
     if (!user) throw new Error("User not found");
 

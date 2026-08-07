@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export async function GET(req: NextRequest) {
   const room = req.nextUrl.searchParams.get('room');
   const username = req.nextUrl.searchParams.get('username') || `User_${Math.floor(Math.random() * 1000)}`;
+  const avatarUrl = req.nextUrl.searchParams.get('avatarUrl') || '';
 
   if (!room) {
     return NextResponse.json({ error: 'Missing "room" query parameter' }, { status: 400 });
@@ -19,7 +20,8 @@ export async function GET(req: NextRequest) {
 
   const userId = req.nextUrl.searchParams.get('userId');
   const identity = userId || username.replace(/\s+/g, '_');
-  const at = new AccessToken(apiKey, apiSecret, { identity, name: username });
+  const metadata = JSON.stringify({ avatarUrl });
+  const at = new AccessToken(apiKey, apiSecret, { identity, name: username, metadata });
   at.addGrant({ roomJoin: true, room: room });
 
   return NextResponse.json({ token: await at.toJwt() });

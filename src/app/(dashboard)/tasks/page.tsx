@@ -132,7 +132,7 @@ function AddTaskModal({ onClose, onAdd }: AddTaskModalProps) {
             <button
               type="submit"
               disabled={!content.trim() || loading}
-              className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-orange-500 to-purple-600 text-white text-sm font-semibold hover:from-orange-400 hover:to-purple-500 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? 'Adding...' : 'Add Task'}
             </button>
@@ -192,7 +192,7 @@ export default function KanbanPage() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-gradient-to-r from-orange-500 to-purple-600 hover:from-orange-400 hover:to-purple-500 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-lg shadow-orange-500/20"
+            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(20,184,166,0.3)]"
           >
             <Plus size={16} />
             Add Task

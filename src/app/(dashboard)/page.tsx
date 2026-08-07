@@ -8,7 +8,7 @@ export default function DashboardOverview() {
       </div>
       <h2 className="text-2xl font-bold text-white mb-3">Welcome to Team OS</h2>
       <p className="text-gray-400 max-w-md">
-        Your next-generation workspace is ready. Use the sidebar to navigate to Chat, Files, Calendar, or Kanban boards.
+        Your next-generation workspace is ready. Use the sidebar to navigate to Chat, Files, Calendar, or Task boards.
       </p>
     </div>
   );

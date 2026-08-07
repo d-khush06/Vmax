@@ -8,23 +8,83 @@ import {
   LiveKitRoom,
   RoomAudioRenderer,
   useTracks,
-  ParticipantTile,
   useLocalParticipant,
   DisconnectButton,
-  useTrackToggle
+  useTrackToggle,
+  VideoTrack
 } from '@livekit/components-react';
-import { Track } from 'livekit-client';
+import { Track, Participant } from 'livekit-client';
 import '@livekit/components-styles';
-import { Mic, ArrowRight, Video, MonitorUp, PhoneOff, MicOff, VideoOff, Users } from 'lucide-react';
+import { Mic, ArrowRight, Video, MonitorUp, PhoneOff, MicOff, VideoOff, Users, SignalHigh, SignalMedium, SignalLow, Settings, MessageSquare, Maximize2 } from 'lucide-react';
+
+function CustomGlassTile({ participant, trackRef, isMaximized, onToggleMaximize }: { participant: Participant, trackRef: any, isMaximized: boolean, onToggleMaximize: () => void }) {
+  const isSpeaking = participant.isSpeaking;
+  const connectionQuality = participant.connectionQuality;
+  const isVideoEnabled = trackRef.publication?.track !== undefined;
+  const isLocal = participant.isLocal;
+  
+  let avatarUrl = '';
+  try {
+    if (participant.metadata) {
+      const meta = JSON.parse(participant.metadata);
+      avatarUrl = meta.avatarUrl || '';
+    }
+  } catch (e) {}
+  
+  // Format the name nicely (removing 'anon_' prefix if present)
+  let displayName = participant.name || participant.identity;
+  if (displayName.startsWith('anon_')) displayName = 'Guest';
+  
+  return (
+    <div className={`rounded-2xl overflow-hidden bg-white/[0.02] backdrop-blur-md relative group transition-all duration-300 border shadow-lg ${isSpeaking ? 'border-teal-400 shadow-[0_0_30px_rgba(45,212,191,0.2)]' : 'border-white/10 hover:border-white/20'} ${isMaximized ? 'w-full h-full' : 'w-full h-[300px]'}`}>
+      
+      {isVideoEnabled ? (
+         <VideoTrack trackRef={trackRef} style={isLocal ? { transform: 'rotateY(0deg)' } : {}} className="w-full h-full object-cover" />
+      ) : (
+         <div className="w-full h-full flex flex-col items-center justify-center bg-black/20">
+           {avatarUrl ? (
+             <img src={avatarUrl} alt={displayName} className={`w-28 h-28 rounded-full border-2 object-cover shadow-inner ${isSpeaking ? 'border-teal-400' : 'border-white/10'}`} />
+           ) : (
+             <div className={`w-28 h-28 rounded-full border-2 flex items-center justify-center text-4xl font-bold text-gray-400 uppercase transition-colors shadow-inner ${isSpeaking ? 'border-teal-400/50 bg-teal-500/10 text-teal-400' : 'bg-white/5 border-white/10'}`}>
+               {displayName.substring(0, 2)}
+             </div>
+           )}
+         </div>
+      )}
+      
+      {/* Maximize Button */}
+      <button 
+        onClick={onToggleMaximize}
+        className="absolute top-4 right-4 w-8 h-8 rounded-lg bg-black/50 backdrop-blur-xl border border-white/10 flex items-center justify-center text-gray-400 hover:text-white hover:bg-black/80 transition-colors opacity-0 group-hover:opacity-100 z-50"
+      >
+        <Maximize2 size={14} />
+      </button>
+
+      {/* Overlay details */}
+      <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between z-20">
+         <div className="flex items-center gap-2 bg-black/60 backdrop-blur-xl px-3 py-1.5 rounded-full border border-white/10 shadow-sm">
+           {isSpeaking ? <Mic size={14} className="text-teal-400 animate-pulse" /> : <MicOff size={14} className="text-red-400" />}
+           <span className="text-xs font-semibold text-gray-200 truncate max-w-[120px]">{displayName}</span>
+         </div>
+         
+         <div className="flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-xl border border-white/10 shadow-sm">
+            {connectionQuality === 'excellent' ? <SignalHigh size={14} className="text-teal-400" /> : 
+             connectionQuality === 'good' ? <SignalMedium size={14} className="text-yellow-400" /> : 
+             <SignalLow size={14} className="text-red-400" />}
+         </div>
+      </div>
+    </div>
+  );
+}
 
 function MicToggle() {
   const { toggle, enabled } = useTrackToggle({ source: Track.Source.Microphone });
   return (
     <button 
       onClick={() => toggle()}
-      className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${enabled ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-400'}`}
+      className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all shadow-sm ${enabled ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}
     >
-      {enabled ? <Mic size={24} /> : <MicOff size={24} />}
+      {enabled ? <Mic size={20} /> : <MicOff size={20} />}
     </button>
   );
 }
@@ -34,9 +94,9 @@ function CameraToggle() {
   return (
     <button 
       onClick={() => toggle()}
-      className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${enabled ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-400'}`}
+      className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all shadow-sm ${enabled ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-400 shadow-[0_0_15px_rgba(239,68,68,0.2)]'}`}
     >
-      {enabled ? <Video size={24} /> : <VideoOff size={24} />}
+      {enabled ? <Video size={20} /> : <VideoOff size={20} />}
     </button>
   );
 }
@@ -46,14 +106,15 @@ function ScreenShareToggle() {
   return (
     <button 
       onClick={() => toggle()}
-      className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${enabled ? 'bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/50 text-blue-400' : 'bg-white/5 hover:bg-white/10 border-white/10 text-white'}`}
+      className={`w-12 h-12 rounded-xl border flex items-center justify-center transition-all shadow-sm ${enabled ? 'bg-teal-500/20 hover:bg-teal-500/30 border-teal-500/50 text-teal-400 shadow-[0_0_15px_rgba(20,184,166,0.2)]' : 'bg-white/5 hover:bg-white/10 border-white/10 text-white'}`}
     >
-      <MonitorUp size={24} />
+      <MonitorUp size={20} />
     </button>
   );
 }
 
 function CustomVoiceUI({ roomName }: { roomName: string }) {
+  const [maximizedTrackId, setMaximizedTrackId] = useState<string | null>(null);
   const tracks = useTracks(
     [
       { source: Track.Source.Camera, withPlaceholder: true },
@@ -62,24 +123,33 @@ function CustomVoiceUI({ roomName }: { roomName: string }) {
     { onlySubscribed: false }
   );
 
+  const maximizedTrack = tracks.find(t => t.participant.identity + t.source === maximizedTrackId);
+  const otherTracks = tracks.filter(t => t.participant.identity + t.source !== maximizedTrackId);
+
   return (
-    <div className="flex flex-col h-full w-full bg-[#0a0a0c]">
-      <header className="flex items-center justify-between p-4 border-b border-white/5 bg-white/[0.01]">
+    <div className="flex flex-col h-full w-full relative overflow-hidden">
+      {/* Ambient Glass Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
+        <div className="absolute top-[20%] left-[10%] w-[60vw] h-[60vw] rounded-full bg-teal-500/10 blur-[130px] animate-pulse-slow" />
+        <div className="absolute bottom-[20%] right-[10%] w-[50vw] h-[50vw] rounded-full bg-blue-500/10 blur-[120px]" />
+      </div>
+
+      <header className="flex items-center justify-between p-4 border-b border-white/5 bg-white/[0.01] backdrop-blur-xl relative z-10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-green-500/20 to-emerald-600/20 flex items-center justify-center border border-green-500/20">
-            <Mic size={20} className="text-green-400" />
+          <div className="w-10 h-10 rounded-xl bg-teal-500/20 flex items-center justify-center border border-teal-500/30">
+            <Mic size={20} className="text-teal-400" />
           </div>
           <div>
-            <h2 className="text-white font-semibold flex items-center gap-2">
+            <h2 className="text-gray-200 font-semibold flex items-center gap-2">
               #{roomName}
-              <span className="px-2 py-0.5 rounded-full bg-green-500/10 text-green-400 text-xs font-medium border border-green-500/20">Active</span>
+              <span className="px-2 py-0.5 rounded-md bg-teal-500/10 text-teal-400 text-xs font-medium border border-teal-500/20">Active</span>
             </h2>
-            <p className="text-gray-400 text-xs">Real-time voice and video</p>
+            <p className="text-gray-500 text-xs">Real-time voice and video</p>
           </div>
         </div>
       </header>
 
-      <div className="flex-1 overflow-hidden p-6 relative">
+      <div className="flex-1 overflow-hidden p-6 relative flex gap-6">
         {tracks.length === 0 ? (
            <div className="absolute inset-0 flex items-center justify-center text-gray-500">
              <div className="text-center">
@@ -87,41 +157,68 @@ function CustomVoiceUI({ roomName }: { roomName: string }) {
                <p>Waiting for participants...</p>
              </div>
            </div>
+        ) : maximizedTrackId && maximizedTrack ? (
+           <>
+             {/* Maximized Main View */}
+             <div className="flex-1 h-full pb-20">
+               <CustomGlassTile 
+                 participant={maximizedTrack.participant} 
+                 trackRef={maximizedTrack} 
+                 isMaximized={true}
+                 onToggleMaximize={() => setMaximizedTrackId(null)}
+               />
+             </div>
+             {/* Sidebar for others */}
+             <div className="w-[300px] h-full overflow-y-auto pb-20 flex flex-col gap-4 pr-2">
+               {otherTracks.map((track) => (
+                 <CustomGlassTile 
+                   key={track.participant.identity + track.source} 
+                   participant={track.participant} 
+                   trackRef={track} 
+                   isMaximized={false}
+                   onToggleMaximize={() => setMaximizedTrackId(track.participant.identity + track.source)}
+                 />
+               ))}
+             </div>
+           </>
         ) : (
-          <div className="grid gap-4 w-full h-full p-4" style={{
-            gridTemplateColumns: `repeat(auto-fit, minmax(280px, 1fr))`,
-            gridAutoRows: '1fr'
-          }}>
-            {tracks.map((track) => {
-              const isSpeaking = track.participant.isSpeaking;
-              return (
-                <div 
+          <div className="w-full h-full flex items-center justify-center pb-20">
+            <div className="w-full max-w-5xl grid gap-6 place-content-center" style={{
+              gridTemplateColumns: `repeat(auto-fit, minmax(280px, 320px))`
+            }}>
+              {tracks.map((track) => (
+                <CustomGlassTile 
                   key={track.participant.identity + track.source} 
-                  className={`rounded-3xl overflow-hidden shadow-2xl bg-black relative group transition-all duration-300 ${isSpeaking ? 'border-2 border-green-500 shadow-[0_0_30px_rgba(34,197,94,0.4)] scale-[1.02]' : 'border border-white/10 hover:border-white/20'}`}
-                >
-                  <ParticipantTile 
-                    trackRef={track}
-                    className="w-full h-full object-cover"
-                  />
-                  {/* Speaker Indicator */}
-                  <div className={`absolute bottom-4 left-4 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-md transition-all duration-300 ${isSpeaking ? 'bg-green-500/80 text-white' : 'bg-black/50 text-gray-400 opacity-0 group-hover:opacity-100'}`}>
-                    {isSpeaking ? <Mic size={14} className="animate-pulse" /> : <MicOff size={14} />}
-                  </div>
-                </div>
-              );
-            })}
+                  participant={track.participant} 
+                  trackRef={track}
+                  isMaximized={false}
+                  onToggleMaximize={() => setMaximizedTrackId(track.participant.identity + track.source)}
+                />
+              ))}
+            </div>
           </div>
         )}
       </div>
 
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center justify-center gap-4 px-6 py-4 rounded-3xl bg-[#0a0a0c]/80 backdrop-blur-xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-50">
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center justify-center gap-3 px-6 py-3 rounded-full bg-black/50 backdrop-blur-3xl border border-white/10 shadow-[0_30px_60px_rgba(0,0,0,0.8)] z-50">
         <MicToggle />
         <CameraToggle />
         <ScreenShareToggle />
         
-        <DisconnectButton className="!w-auto !px-6 !h-14 !rounded-2xl !bg-red-500 hover:!bg-red-600 !border-0 !text-white flex items-center justify-center transition-all ml-4 gap-2 font-bold shadow-lg shadow-red-500/20 transform hover:-translate-y-1">
-          <PhoneOff size={20} />
-          <span>Leave</span>
+        <div className="w-px h-8 bg-white/10 mx-2"></div>
+
+        <button className="w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all">
+          <MessageSquare size={16} />
+        </button>
+        <button className="w-10 h-10 rounded-full border border-white/10 bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 hover:text-white transition-all">
+          <Settings size={16} />
+        </button>
+
+        <div className="w-px h-8 bg-white/10 mx-2"></div>
+        
+        <DisconnectButton className="!w-auto !px-5 !py-2.5 !h-12 !rounded-xl !bg-red-500 hover:!bg-red-600 !border-0 !text-white flex items-center justify-center transition-all gap-2 font-bold shadow-[0_0_20px_rgba(239,68,68,0.3)] transform hover:scale-105">
+          <PhoneOff size={16} />
+          <span className="text-sm">Leave</span>
         </DisconnectButton>
       </div>
     </div>
@@ -138,6 +235,7 @@ export default function VoiceRoomPage() {
   const roomName = team?.name ? `${team.name.toLowerCase().replace(/\s+/g, '-')}-voice` : 'general-voice';
   const username = user?.fullName || user?.firstName || 'User';
   const userId = user?.id || `anon_${Math.random()}`;
+  const avatarUrl = user?.imageUrl || '';
 
   useEffect(() => {
     if (!hasJoined || !team) return;
@@ -145,7 +243,7 @@ export default function VoiceRoomPage() {
     (async () => {
       try {
         const resp = await fetch(
-          `/api/livekit?room=${roomName}&username=${encodeURIComponent(username)}&userId=${encodeURIComponent(userId)}`
+          `/api/livekit?room=${roomName}&username=${encodeURIComponent(username)}&userId=${encodeURIComponent(userId)}&avatarUrl=${encodeURIComponent(avatarUrl)}`
         );
         const data = await resp.json();
         setToken(data.token);
@@ -157,27 +255,27 @@ export default function VoiceRoomPage() {
 
   if (!hasJoined) {
     return (
-      <div className="absolute inset-0 bg-transparent flex flex-col items-center justify-center z-50">
-        <div className="w-full max-w-sm bg-[#0a0a0c]/80 backdrop-blur-2xl border border-white/10 p-6 rounded-3xl shadow-2xl flex flex-col items-center text-center animate-in fade-in slide-in-from-bottom-8 duration-700">
-          <div className="w-16 h-16 rounded-full bg-gradient-to-br from-green-400/20 to-emerald-600/20 flex items-center justify-center mb-5 border border-green-500/20 shadow-[0_0_40px_rgba(34,197,94,0.15)]">
-            <Mic size={28} className="text-green-400" />
+      <div className="absolute inset-0 bg-[#121212]/80 backdrop-blur-md flex flex-col items-center justify-center z-50">
+        <div className="w-full max-w-sm bg-black/40 backdrop-blur-3xl border border-white/10 p-8 rounded-3xl shadow-[0_30px_60px_rgba(0,0,0,0.6)] flex flex-col items-center text-center">
+          <div className="w-16 h-16 rounded-xl bg-teal-500/10 flex items-center justify-center mb-5 border border-teal-500/20">
+            <Mic size={28} className="text-teal-400" />
           </div>
           
-          <h2 className="text-xl font-bold text-white mb-2 tracking-tight">Ready to join?</h2>
+          <h2 className="text-xl font-bold text-gray-200 mb-2 tracking-tight">Ready to join?</h2>
           <p className="text-gray-400 mb-8">
-            You are about to join the <span className="text-white font-medium">#{roomName}</span> channel.
+            You are about to join the <span className="text-gray-200 font-medium">#{roomName}</span> channel.
           </p>
 
           <button
             onClick={() => setHasJoined(true)}
-            className="w-full py-3 rounded-2xl bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-400 hover:to-emerald-500 text-white font-bold text-base shadow-lg shadow-green-500/25 hover:shadow-green-500/40 transition-all flex items-center justify-center gap-2 group"
+            className="w-full py-3 rounded-lg bg-teal-500 hover:bg-teal-400 text-white font-bold text-base shadow-sm transition-all flex items-center justify-center gap-2 group"
           >
             Join Voice <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
           </button>
 
           <button 
             onClick={() => router.push('/tasks')}
-            className="mt-4 text-sm font-medium text-gray-500 hover:text-white transition-colors"
+            className="mt-4 text-sm font-medium text-gray-500 hover:text-teal-400 transition-colors"
           >
             Cancel and return
           </button>
@@ -196,7 +294,7 @@ export default function VoiceRoomPage() {
   }
 
   return (
-    <div className="absolute inset-0 bg-black flex flex-col z-50 overflow-hidden" data-lk-theme="default">
+    <div className="absolute inset-0 flex flex-col z-50 overflow-hidden" data-lk-theme="default">
       <LiveKitRoom
         video={false}
         audio={false}

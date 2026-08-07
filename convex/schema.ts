@@ -29,6 +29,11 @@ export default defineSchema({
     userId: v.id("users"),
     channelId: v.string(),
     content: v.string(),
+    gifUrl: v.optional(v.string()),
+    fileStorageId: v.optional(v.id("_storage")),
+    fileName: v.optional(v.string()),
+    fileType: v.optional(v.string()),
+    isEdited: v.optional(v.boolean()),
   }).index("by_team_and_channel", ["teamId", "channelId"]),
 
   kanbanTasks: defineTable({

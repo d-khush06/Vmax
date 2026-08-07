@@ -58,33 +58,16 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <div className="relative flex h-screen w-full bg-[#030303] text-gray-100 overflow-hidden font-sans">
+    <div className="relative flex h-screen w-full bg-[#121212] text-gray-200 overflow-hidden font-sans">
       
-      {/* 1. Ambient Celestial Background - Animated & Upgraded */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
-        <motion.div 
-          animate={{ rotate: 360, scale: [1, 1.1, 1] }} 
-          transition={{ duration: 40, repeat: Infinity, ease: "linear" }}
-          className="absolute -top-[30%] -left-[10%] w-[70vw] h-[70vw] rounded-full bg-gradient-to-br from-purple-600/10 to-indigo-900/20 blur-[120px]" 
-        />
-        <motion.div 
-          animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[20%] right-[10%] w-[40vw] h-[40vw] rounded-full bg-gradient-to-tr from-blue-500/10 to-cyan-400/5 blur-[100px]" 
-        />
-        <motion.div 
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[-20%] left-[30%] w-[50vw] h-[50vw] rounded-full bg-gradient-to-t from-orange-500/10 via-rose-500/5 to-transparent blur-[130px]" 
-        />
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-[0.04] mix-blend-overlay"></div>
+      {/* Ambient Glass Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
+        <div className="absolute top-[10%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-teal-500/5 blur-[120px]" />
+        <div className="absolute bottom-[10%] right-[20%] w-[40vw] h-[40vw] rounded-full bg-blue-500/5 blur-[100px]" />
       </div>
 
       {/* App Container */}
-      <div className="relative z-10 w-full h-full flex overflow-hidden pointer-events-auto bg-[#0c0c0e]/90 backdrop-blur-3xl shadow-[0_20px_60px_rgba(0,0,0,0.8)]">
-          
-          {/* Subtle inner top glow for the app container */}
-          <div className="absolute top-0 left-0 right-0 h-32 bg-gradient-to-b from-orange-500/10 via-purple-500/5 to-transparent pointer-events-none" />
+      <div className="relative z-10 w-full h-full flex overflow-hidden pointer-events-auto bg-black/40 backdrop-blur-3xl shadow-[inset_0_0_100px_rgba(255,255,255,0.01)]">
 
           {/* Mobile Sidebar Backdrop */}
           <AnimatePresence>
@@ -103,7 +86,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
           <motion.aside 
             initial={false}
             animate={{ width: isSidebarOpen ? 240 : 72, x: isMobileMenuOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 768 ? -240 : 0) }}
-            className={`absolute md:relative z-50 md:z-30 h-full flex flex-col bg-[#0a0a0c]/95 md:bg-transparent border-r border-white/5 transition-all duration-300 ease-in-out flex-shrink-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+            className={`absolute md:relative z-50 md:z-30 h-full flex flex-col bg-white/[0.02] backdrop-blur-2xl border-r border-white/5 transition-all duration-300 ease-in-out flex-shrink-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
           >
             <div className="h-16 flex items-center px-3 shrink-0 relative">
               <button 
@@ -111,7 +94,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                 className={`w-full h-10 flex items-center ${isSidebarOpen ? 'justify-between px-3' : 'justify-center'} rounded-xl hover:bg-white/5 transition-colors cursor-pointer outline-none group`}
               >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-6 h-6 rounded-md bg-gradient-to-br from-orange-500 to-purple-600 flex items-center justify-center shrink-0 shadow-lg shadow-orange-500/20 text-white font-bold text-[10px]">
+                  <div className="w-6 h-6 rounded-md bg-teal-500 flex items-center justify-center shrink-0 text-white font-bold text-[10px]">
                      {team?.name?.substring(0, 2).toUpperCase() || 'VM'}
                   </div>
                   <AnimatePresence>
@@ -141,7 +124,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                       animate={{ opacity: 1, y: 0, scale: 1 }}
                       exit={{ opacity: 0, y: -10, scale: 0.95 }}
                       transition={{ duration: 0.15 }}
-                      className="absolute top-16 left-3 w-64 bg-[#0a0a0c]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col"
+                      className="absolute top-16 left-3 w-64 bg-[#222] border border-[#333] rounded-lg shadow-2xl overflow-hidden z-50 flex flex-col"
                     >
                       <div className="p-2">
                         <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Workspaces</div>
@@ -161,7 +144,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                                   {t.name}
                                 </span>
                               </div>
-                              {team?._id === t._id && <Check size={14} className="text-orange-500 shrink-0" />}
+                              {team?._id === t._id && <Check size={14} className="text-teal-400 shrink-0" />}
                             </button>
                           ))}
                         </div>
@@ -202,20 +185,13 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                </AnimatePresence>
             </div>
 
-            <div className="flex-1 flex flex-col gap-2 px-3 mt-4 overflow-y-auto hide-scrollbar">
+            <div className="flex-1 flex flex-col gap-1 px-3 mt-4 overflow-y-auto hide-scrollbar">
               {dockApps.map((app) => {
                 const isActive = pathname?.includes(app.href);
                 return (
                   <Link key={app.name} href={app.href} className="relative group">
-                    {isActive && (
-                      <motion.div 
-                        layoutId="activeTab" 
-                        className="absolute inset-0 bg-gradient-to-r from-white/10 to-white/5 rounded-xl border border-white/10" 
-                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                      />
-                    )}
-                    <div className={`relative z-10 flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all duration-300 ${isActive ? 'text-white shadow-[0_0_15px_rgba(255,255,255,0.1)]' : 'text-gray-400 group-hover:bg-white/5 group-hover:text-gray-200'}`}>
-                      <app.icon size={18} className={`shrink-0 transition-transform duration-300 ${isActive ? 'scale-110 drop-shadow-[0_0_8px_rgba(255,255,255,0.5)]' : 'group-hover:scale-110'}`} />
+                    <div className={`relative z-10 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 border-l-2 ${isActive ? 'text-teal-400 bg-white/[0.05] border-teal-400 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]' : 'text-gray-400 group-hover:bg-white/[0.03] group-hover:text-gray-200 border-transparent'}`}>
+                      <app.icon size={18} className="shrink-0" />
                       <AnimatePresence>
                         {isSidebarOpen && (
                           <motion.div 
@@ -224,7 +200,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                             exit={{ opacity: 0, width: 0 }}
                             className="overflow-hidden whitespace-nowrap flex-1"
                           >
-                            <span className={`text-sm ${isActive ? 'font-bold tracking-wide' : 'font-medium'}`}>{app.name}</span>
+                            <span className={`text-sm ${isActive ? 'font-medium' : 'font-medium'}`}>{app.name}</span>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -247,7 +223,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
           {/* 3. Main Content Area */}
           <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
             {/* Top Header */}
-            <header className="h-16 flex items-center justify-between px-4 md:px-6 shrink-0 z-10 border-b border-white/5">
+            <header className="h-16 flex items-center justify-between px-4 md:px-6 shrink-0 z-10 border-b border-white/5 bg-white/[0.01] backdrop-blur-xl">
               <div className="flex-1 flex items-center gap-3 md:gap-4">
                 <button
                   onClick={() => setIsMobileMenuOpen(true)}
@@ -256,8 +232,8 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                   <Menu size={20} />
                 </button>
                 <div className="relative group w-full max-w-md hidden sm:block">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-white transition-colors" />
-                  <input type="text" placeholder="Search across workspace..." className="w-full bg-white/[0.03] border border-white/5 rounded-full py-2 pl-10 pr-4 text-sm text-gray-200 focus:outline-none focus:border-white/20 focus:bg-white/[0.05] transition-all placeholder-gray-600 shadow-inner" />
+                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-gray-300 transition-colors" />
+                  <input type="text" placeholder="Search..." className="w-full bg-white/[0.03] border border-white/10 rounded-lg py-1.5 pl-9 pr-4 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:bg-white/[0.05] transition-all placeholder-gray-500 shadow-inner" />
                 </div>
               </div>
               
@@ -284,7 +260,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                           animate={{ opacity: 1, y: 0, scale: 1 }}
                           exit={{ opacity: 0, y: 10, scale: 0.95 }}
                           transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-3 w-64 bg-[#0a0a0c]/95 backdrop-blur-xl border border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 origin-top-right"
+                          className="absolute right-0 top-full mt-3 w-64 bg-[#222] border border-[#333] rounded-lg shadow-2xl overflow-hidden z-50 origin-top-right"
                         >
                           <div className="p-4 border-b border-white/5 flex items-center gap-3">
                             <img src={user?.imageUrl || `https://i.pravatar.cc/150?u=${user?.id}`} className="w-10 h-10 rounded-full border border-white/10" />
@@ -334,7 +310,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                       initial={{ width: 0, opacity: 0 }}
                       animate={{ width: 280, opacity: 1 }}
                       exit={{ width: 0, opacity: 0 }}
-                      className="border-l border-white/5 bg-[#0a0a0c]/95 md:bg-[#0a0a0c]/80 backdrop-blur-xl h-full flex flex-col shrink-0 overflow-hidden absolute right-0 top-0 bottom-0 z-40 lg:relative lg:z-auto"
+                      className="border-l border-white/5 bg-white/[0.02] backdrop-blur-2xl h-full flex flex-col shrink-0 overflow-hidden absolute right-0 top-0 bottom-0 z-40 lg:relative lg:z-auto"
                    >
                      <div className="p-4 border-b border-white/5">
                         <h3 className="font-semibold text-white">Team Members</h3>

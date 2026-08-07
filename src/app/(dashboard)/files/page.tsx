@@ -22,6 +22,9 @@ export default function FilesPage() {
   const [toastMsg, setToastMsg] = useState<string | null>(null);
   const [activeMenu, setActiveMenu] = useState<string | null>(null);
   const [editingFile, setEditingFile] = useState<{ id: string, name: string } | null>(null);
+  
+  const [filterType, setFilterType] = useState<string>('all');
+  const [sortOrder, setSortOrder] = useState<'desc' | 'asc'>('desc');
 
   const showToast = (msg: string) => {
     setToastMsg(msg);
@@ -59,9 +62,9 @@ export default function FilesPage() {
       });
 
       showToast(`Successfully uploaded ${file.name}`);
-    } catch (err) {
-      console.error(err);
-      alert("Failed to upload file");
+    } catch (err: any) {
+      console.error("Upload error details:", err);
+      alert(`Upload Failed: ${err.message || 'Unknown error'}`);
     } finally {
       setIsUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
@@ -106,19 +109,49 @@ export default function FilesPage() {
   };
 
   return (
-    <div className="h-full w-full flex flex-col p-6 bg-white/[0.01] relative" onClick={() => setActiveMenu(null)}>
+    <div className="h-full w-full flex flex-col p-6 relative overflow-hidden" onClick={() => setActiveMenu(null)}>
+      {/* Ambient Glass Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
+        <div className="absolute top-[30%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-teal-500/10 blur-[130px]" />
+        <div className="absolute bottom-[20%] right-[30%] w-[40vw] h-[40vw] rounded-full bg-blue-500/10 blur-[120px]" />
+      </div>
+
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-green-500/20 border border-green-500/50 text-green-100 px-4 py-2 rounded-full shadow-lg flex items-center gap-2 z-50 animate-in fade-in slide-in-from-top-4">
-          <Check size={16} className="text-green-400" />
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-teal-500/20 border border-teal-500/50 text-teal-100 px-4 py-2 rounded-full shadow-[0_10px_30px_rgba(20,184,166,0.3)] flex items-center gap-2 z-50 animate-in fade-in slide-in-from-top-4 backdrop-blur-md">
+          <Check size={16} className="text-teal-400" />
           <span className="text-sm font-medium">{toastMsg}</span>
         </div>
       )}
 
-      <header className="mb-8 flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400">Resource Center</h2>
-          <p className="text-gray-400 text-sm">Secure team file storage.</p>
+      <header className="mb-6 px-5 py-4 flex items-center justify-between relative z-10 bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-2xl shadow-lg">
+        <div className="flex items-center gap-6">
+          <div>
+            <h2 className="text-2xl font-bold text-gray-200 tracking-tight flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shadow-inner">
+                <Folder size={18} className="text-teal-400" />
+              </div>
+              Resource Center
+            </h2>
+            <p className="text-gray-500 text-[13px] mt-1 ml-13 font-medium">Secure team file storage.</p>
+          </div>
+          
+          <div className="hidden md:flex items-center gap-3 ml-4 pl-6 border-l border-white/10 h-10">
+            <button 
+              onClick={() => setFilterType(filterType === 'all' ? 'image' : filterType === 'image' ? 'pdf' : 'all')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${filterType !== 'all' ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
+              Filter: {filterType === 'all' ? 'All' : filterType === 'image' ? 'Images' : 'PDFs'}
+            </button>
+            <button 
+              onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${sortOrder === 'asc' ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+            >
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
+              Sort: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
+            </button>
+          </div>
         </div>
         <div>
           <input 
@@ -130,7 +163,7 @@ export default function FilesPage() {
           <button 
             onClick={handleUploadClick}
             disabled={isUploading}
-            className="bg-white/10 hover:bg-white/20 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors border border-white/10 shadow-sm flex items-center gap-2"
+            className="bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_rgba(20,184,166,0.3)] flex items-center gap-2"
           >
             {isUploading && <Loader2 size={16} className="animate-spin" />}
             {isUploading ? 'Uploading...' : 'Upload File'}
@@ -138,7 +171,7 @@ export default function FilesPage() {
         </div>
       </header>
 
-      <div className="flex-1 bg-black/20 rounded-2xl border border-white/5 backdrop-blur-md overflow-hidden flex flex-col">
+      <div className="flex-1 bg-white/[0.02] backdrop-blur-sm rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col relative z-10">
         {/* Table Header */}
         <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
           <div className="col-span-6">Name</div>
@@ -154,10 +187,23 @@ export default function FilesPage() {
           ) : files.length === 0 ? (
             <div className="flex justify-center py-10 text-gray-500">No files uploaded yet.</div>
           ) : (
-            files.map((file) => (
-              <div key={file._id} className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/[0.02] hover:bg-white/[0.03] transition-colors items-center group">
+            (() => {
+              let processedFiles = [...files];
+              if (filterType !== 'all') {
+                processedFiles = processedFiles.filter(f => f.type?.includes(filterType));
+              }
+              if (sortOrder === 'asc') {
+                processedFiles.reverse();
+              }
+              
+              if (processedFiles.length === 0) {
+                return <div className="flex justify-center py-10 text-gray-500">No files match your filter.</div>;
+              }
+
+              return processedFiles.map((file) => (
+                <div key={file._id} className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 hover:bg-white/[0.03] transition-colors items-center group">
                 <div className="col-span-6 flex items-center gap-3 overflow-hidden">
-                  <div className="w-10 h-10 shrink-0 rounded-lg bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
+                  <div className="w-10 h-10 shrink-0 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors shadow-sm">
                     {getIcon(file.type)}
                   </div>
                   {editingFile?.id === file._id ? (
@@ -207,8 +253,9 @@ export default function FilesPage() {
                   )}
                 </div>
               </div>
-            ))
-          )}
+            ));
+          })()
+        )}
         </div>
       </div>
     </div>

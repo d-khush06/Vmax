@@ -1,4 +1,4 @@
-import CustomAuthModal from '@/components/CustomAuthModal';
+import { SignUp } from '@clerk/nextjs';
 import Link from 'next/link';
 
 export default function SignUpPage() {
@@ -13,7 +13,9 @@ export default function SignUpPage() {
         <Link href="/" className="absolute -top-12 left-0 text-sm font-semibold text-gray-400 hover:text-white transition-colors">
           ← Back to Home
         </Link>
-        <CustomAuthModal initialMode="sign-up" />
+        <div className="flex justify-center">
+          <SignUp routing="hash" />
+        </div>
       </div>
     </div>
   );
