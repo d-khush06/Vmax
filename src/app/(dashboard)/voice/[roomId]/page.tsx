@@ -21,7 +21,7 @@ function MicToggle() {
   const { toggle, enabled } = useTrackToggle({ source: Track.Source.Microphone });
   return (
     <button 
-      onClick={toggle}
+      onClick={() => toggle()}
       className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${enabled ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-400'}`}
     >
       {enabled ? <Mic size={24} /> : <MicOff size={24} />}
@@ -33,7 +33,7 @@ function CameraToggle() {
   const { toggle, enabled } = useTrackToggle({ source: Track.Source.Camera });
   return (
     <button 
-      onClick={toggle}
+      onClick={() => toggle()}
       className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${enabled ? 'bg-white/5 hover:bg-white/10 border-white/10 text-white' : 'bg-red-500/20 hover:bg-red-500/30 border-red-500/50 text-red-400'}`}
     >
       {enabled ? <Video size={24} /> : <VideoOff size={24} />}
@@ -45,7 +45,7 @@ function ScreenShareToggle() {
   const { toggle, enabled } = useTrackToggle({ source: Track.Source.ScreenShare });
   return (
     <button 
-      onClick={toggle}
+      onClick={() => toggle()}
       className={`w-14 h-14 rounded-2xl border flex items-center justify-center transition-all ${enabled ? 'bg-blue-500/20 hover:bg-blue-500/30 border-blue-500/50 text-blue-400' : 'bg-white/5 hover:bg-white/10 border-white/10 text-white'}`}
     >
       <MonitorUp size={24} />
