@@ -59,4 +59,9 @@ export default defineSchema({
     size: v.number(),
     type: v.string(), // e.g. "image/png", "application/pdf"
   }).index("by_team", ["teamId"]),
+
+  whiteboards: defineTable({
+    teamId: v.id("teams"),
+    snapshot: v.string(), // Serialized JSON of the TLDraw store
+  }).index("by_team", ["teamId"]),
 });

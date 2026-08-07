@@ -28,7 +28,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen w-screen bg-[#030303] flex flex-col relative overflow-x-hidden text-gray-200" style={{ fontFamily: "'Inter', sans-serif" }}>
-      
+
       {/* ── Ambient background glows ── */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 left-1/2 -translate-x-1/2 w-[90vw] h-[60vh] rounded-full bg-gradient-radial from-teal-500/20 via-blue-600/5 to-transparent blur-[100px]" />
@@ -49,7 +49,7 @@ export default function LandingPage() {
           <a href="#features" className="text-sm text-gray-400 hover:text-white transition-colors">Features</a>
           <a href="#stats" className="text-sm text-gray-400 hover:text-white transition-colors">About</a>
         </div>
-        
+
         <div className="flex items-center gap-3">
           {isSignedIn ? (
             <Link
@@ -79,7 +79,7 @@ export default function LandingPage() {
 
       {/* ── Hero ── */}
       <main className="relative z-10 flex-1 flex flex-col items-center text-center px-6 pt-16 pb-28 max-w-5xl mx-auto w-full">
-        
+
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}

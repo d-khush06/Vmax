@@ -42,9 +42,11 @@ export default function WhiteboardPage() {
 
       <div className="flex-1 overflow-hidden bg-white/[0.02] backdrop-blur-sm rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] relative z-10 group">
         <div className="absolute inset-0">
-          <SyncedWhiteboard 
-            roomId={`vmax-whiteboard-${team?._id || 'default'}`}
-          />
+          {team ? (
+            <SyncedWhiteboard teamId={team._id} />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-gray-500">Loading Whiteboard...</div>
+          )}
         </div>
       </div>
     </div>
