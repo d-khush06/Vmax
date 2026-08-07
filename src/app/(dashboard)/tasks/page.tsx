@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState } from 'react';
-import { DndContext, closestCorners, DragOverlay } from '@dnd-kit/core';
+import { DndContext, closestCorners, DragOverlay, useDroppable } from '@dnd-kit/core';
 import { SortableContext, useSortable, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { useTeam } from '@/lib/team-context';
@@ -16,8 +16,17 @@ const defaultCols = [
   { id: 'done', title: 'Done', color: 'from-green-500/20 to-green-500/5', dot: 'bg-green-400' },
 ];
 
+function DroppableColumn({ id, children }: { id: string; children: React.ReactNode }) {
+  const { setNodeRef } = useDroppable({ id });
+  return (
+    <div ref={setNodeRef} className="flex-1 overflow-y-auto min-h-[200px] rounded-xl bg-white/[0.01] border border-dashed border-white/5 p-2">
+      {children}
+    </div>
+  );
+}
+
 function SortableTask({ task }: { task: any }) {
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task.id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: task._id });
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0 : 1 };
 
   return (
@@ -154,10 +163,10 @@ export default function KanbanPage() {
     const overId = over.id;
     let newColumnId = overId;
 
-    const overTask = tasks.find((t: any) => t.id === overId);
+    const overTask = tasks.find((t: any) => t._id === overId);
     if (overTask) newColumnId = overTask.column_id;
 
-    const activeTask = tasks.find((t: any) => t.id === taskId);
+    const activeTask = tasks.find((t: any) => t._id === taskId);
     if (activeTask && activeTask.column_id !== newColumnId) {
       await updateColumn({ taskId, columnId: newColumnId });
     }
@@ -211,10 +220,10 @@ export default function KanbanPage() {
                     </div>
                   </div>
 
-                  <div className="flex-1 overflow-y-auto min-h-[200px] rounded-xl bg-white/[0.01] border border-dashed border-white/5 p-2">
-                    <SortableContext id={col.id} items={colTasks.map((t: any) => t.id)} strategy={verticalListSortingStrategy}>
+                  <DroppableColumn id={col.id}>
+                    <SortableContext id={col.id} items={colTasks.map((t: any) => t._id)} strategy={verticalListSortingStrategy}>
                       {colTasks.map((task: any) => (
-                        <SortableTask key={task.id} task={task} />
+                        <SortableTask key={task._id} task={task} />
                       ))}
                       {colTasks.length === 0 && (
                         <div className="h-full min-h-[150px] flex items-center justify-center text-gray-600 text-xs">
@@ -222,7 +231,7 @@ export default function KanbanPage() {
                         </div>
                       )}
                     </SortableContext>
-                  </div>
+                  </DroppableColumn>
 
                   <button
                     onClick={() => setShowAddModal(true)}
@@ -237,7 +246,7 @@ export default function KanbanPage() {
             <DragOverlay>
               {activeId ? (
                 <div className="bg-white/10 p-4 rounded-xl border border-orange-500/50 text-sm text-white shadow-2xl scale-105 cursor-grabbing">
-                  {tasks.find((t: any) => t.id === activeId)?.content}
+                  {tasks.find((t: any) => t._id === activeId)?.content}
                 </div>
               ) : null}
             </DragOverlay>

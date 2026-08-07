@@ -70,3 +70,18 @@ export const listFiles = query({
     );
   },
 });
+
+export const deleteFile = mutation({
+  args: { fileId: v.id("files"), storageId: v.id("_storage") },
+  handler: async (ctx, args) => {
+    await ctx.db.delete(args.fileId);
+    await ctx.storage.delete(args.storageId);
+  },
+});
+
+export const renameFile = mutation({
+  args: { fileId: v.id("files"), newName: v.string() },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.fileId, { name: args.newName });
+  },
+});

@@ -15,7 +15,9 @@ export default function WhiteboardPage() {
       </header>
 
       <div className="flex-1 overflow-hidden bg-black rounded-2xl border border-white/5 relative">
-        <Tldraw persistenceKey="teamos-whiteboard" />
+        <div className="absolute inset-0">
+          <Tldraw persistenceKey="teamos-whiteboard" />
+        </div>
       </div>
     </div>
   );

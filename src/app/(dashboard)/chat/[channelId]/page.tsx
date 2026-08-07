@@ -47,18 +47,22 @@ export default function ChatPage() {
           messages.map((msg: any, i: number) => {
             const isMe = msg.users?.clerkId === user?.id;
             return (
-              <div key={msg._id} className={`flex gap-4 ${isMe ? 'flex-row-reverse' : ''}`}>
-                <img src={msg.users?.avatar_url || `https://i.pravatar.cc/150?u=${i}`} alt="Avatar" className="w-10 h-10 rounded-full border border-white/10" />
-                <div className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}>
+              <div key={msg._id} className="group flex gap-4 hover:bg-white/[0.02] px-4 py-2 -mx-4 rounded-xl transition-colors">
+                <img 
+                  src={msg.users?.avatar_url || `https://i.pravatar.cc/150?u=${i}`} 
+                  alt="Avatar" 
+                  className="w-10 h-10 rounded-full border border-white/10 shrink-0 mt-0.5" 
+                />
+                <div className="flex flex-col min-w-0">
                   <div className="flex items-baseline gap-2">
-                    <span className={`font-medium ${isMe ? 'text-orange-300' : 'text-indigo-300'}`}>{isMe ? 'You' : (msg.users?.full_name || 'Member')}</span>
-                    <span className="text-xs text-gray-500">{new Date(msg.created_at).toLocaleTimeString()}</span>
+                    <span className={`font-semibold ${isMe ? 'text-green-400' : 'text-indigo-400'}`}>
+                      {isMe ? 'You' : (msg.users?.full_name || 'Member')}
+                    </span>
+                    <span className="text-[11px] font-medium text-gray-500">
+                      {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
-                  <p className={`px-4 py-2 mt-1 shadow-sm max-w-[85%] ${
-                    isMe 
-                      ? 'bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-2xl rounded-tr-sm' 
-                      : 'bg-white/5 text-gray-300 rounded-2xl rounded-tl-sm border border-white/5'
-                  }`}>
+                  <p className="text-gray-300 text-[15px] leading-relaxed mt-0.5 whitespace-pre-wrap break-words">
                     {msg.content}
                   </p>
                 </div>

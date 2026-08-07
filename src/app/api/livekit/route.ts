@@ -17,7 +17,8 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Server misconfigured' }, { status: 500 });
   }
 
-  const at = new AccessToken(apiKey, apiSecret, { identity: username });
+  const identity = username.replace(/\s+/g, '_');
+  const at = new AccessToken(apiKey, apiSecret, { identity, name: username });
   at.addGrant({ roomJoin: true, room: room });
 
   return NextResponse.json({ token: await at.toJwt() });
