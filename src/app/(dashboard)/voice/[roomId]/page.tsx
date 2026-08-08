@@ -13,6 +13,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
   const [micEnabled, setMicEnabled] = useState(false);
   const [camEnabled, setCamEnabled] = useState(false);
   const [screenEnabled, setScreenEnabled] = useState(false);
+  const [localMicTrack, setLocalMicTrack] = useState<any>(null);
   const [maximizedUser, setMaximizedUser] = useState<string | null>(null);
   
   const { team } = useTeam();
@@ -56,13 +57,14 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
 
     setLocalCamTrack(null);
     setLocalScreenTrack(null);
+    setLocalMicTrack(null);
 
     setMicEnabled(false);
     setCamEnabled(false);
     setScreenEnabled(false);
     setPeers([]);
     
-    router.push('/chat');
+    router.push('/chat/general');
   };
 
   useEffect(() => {
@@ -158,7 +160,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
         if (np.videoTrack?.producerId === producerId) np.videoTrack = undefined;
         if (np.screenTrack?.producerId === producerId) np.screenTrack = undefined;
         return np;
-      }).filter(p => p.audioTrack || p.videoTrack || p.screenTrack));
+      }));
     });
 
     socket.on('peerClosed', ({ peerId }: any) => {
@@ -198,11 +200,13 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
         const existing: any = prev.find(p => p.id === peerId) || { id: peerId, name: peerName, avatarUrl: peerAvatarUrl };
         const others = prev.filter(p => p.id !== peerId);
         
-        if (appData.type === 'audio') existing.audioTrack = { track, producerId };
-        if (appData.type === 'video') existing.videoTrack = { track, producerId };
-        if (appData.type === 'screen') existing.screenTrack = { track, producerId };
+        const updatedExisting = { ...existing };
         
-        return [...others, existing];
+        if (appData.type === 'audio') updatedExisting.audioTrack = { track, producerId };
+        if (appData.type === 'video') updatedExisting.videoTrack = { track, producerId };
+        if (appData.type === 'screen') updatedExisting.screenTrack = { track, producerId };
+        
+        return [...others, updatedExisting];
       });
     });
   };
@@ -213,6 +217,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
       micProducerRef.current.track?.stop();
       micProducerRef.current.close();
       socketRef.current?.emit('closeProducer', { roomId, producerId: micProducerRef.current.id });
+      setLocalMicTrack(null);
       setMicEnabled(false);
       return;
     }
@@ -221,6 +226,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const track = stream.getAudioTracks()[0];
       micProducerRef.current = await sendTransportRef.current.produce({ track, appData: { type: 'audio' } });
+      setLocalMicTrack(track);
       setMicEnabled(true);
     } catch (e: any) { 
       if (e.name === 'NotAllowedError') {
@@ -288,15 +294,15 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
   if (!hasJoined) {
     return (
       <div className="h-full w-full flex items-center justify-center p-6 relative bg-[#030303]">
-        <div className="max-w-md w-full bg-[#0a0a0a] rounded-3xl p-10 border border-white/5 shadow-2xl text-center">
-          <div className="w-20 h-20 bg-teal-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Mic size={32} className="text-teal-400" />
+        <div className="max-w-md w-full bg-[#0b120c] rounded-3xl p-10 border border-white/5 shadow-2xl text-center">
+          <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Mic size={32} className="text-green-400" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Join Voice Room</h2>
           <p className="text-gray-400 text-sm mb-8">Connect with your team in real-time. Start with your mic and camera off.</p>
           <button 
             onClick={joinRoom}
-            className="w-full py-4 bg-teal-500 hover:bg-teal-400 text-white rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(20,184,166,0.3)]"
+            className="w-full py-4 bg-green-500 hover:bg-green-400 text-white rounded-xl font-bold transition-all shadow-[0_0_20px_rgba(34,197,94,0.3)]"
           >
             Join Room Now
           </button>
@@ -327,6 +333,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
       <MediaGrid 
         localCamTrack={localCamTrack} 
         localScreenTrack={localScreenTrack} 
+        localMicTrack={localMicTrack}
         camEnabled={camEnabled}
         screenEnabled={screenEnabled}
         micEnabled={micEnabled}
@@ -338,7 +345,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
       />
 
       {/* Control Bar */}
-      <div className="h-24 mt-4 bg-[#0a0a0a] rounded-3xl border border-white/5 flex items-center justify-center gap-4 shadow-xl">
+      <div className="h-24 mt-4 bg-[#0b120c] rounded-3xl border border-white/5 flex items-center justify-center gap-4 shadow-xl">
         <button 
           onClick={toggleMic}
           className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${micEnabled ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
@@ -353,7 +360,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
         </button>
         <button 
           onClick={toggleScreen}
-          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${screenEnabled ? 'bg-teal-500/20 text-teal-400 border border-teal-500/30 shadow-[0_0_15px_rgba(20,184,166,0.3)]' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+          className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${screenEnabled ? 'bg-green-500/20 text-green-400 border border-green-500/30 shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 'bg-white/10 hover:bg-white/20 text-white'}`}
         >
           <MonitorUp size={20} />
         </button>
@@ -377,7 +384,18 @@ function VideoPlayer({ track, isScreen, isLocal }: { track: any, isScreen?: bool
   const ref = useRef<HTMLVideoElement>(null);
   useEffect(() => {
     if (ref.current && track) {
-      ref.current.srcObject = new MediaStream([track]);
+      const currentStream = ref.current.srcObject as MediaStream;
+      if (currentStream && currentStream.getTracks()[0] === track) {
+        return; // Track is already assigned
+      }
+      
+      const stream = new MediaStream([track]);
+      ref.current.srcObject = stream;
+      
+      const playPromise = ref.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {}); // Suppress DOMException
+      }
     }
   }, [track]);
   return <video ref={ref} autoPlay playsInline muted={isLocal} className={`w-full h-full ${isScreen ? 'object-contain bg-black' : 'object-cover'} ${isLocal && !isScreen ? 'scale-x-[-1]' : ''}`} />;
@@ -387,14 +405,99 @@ function AudioPlayer({ track }: { track: any }) {
   const ref = useRef<HTMLAudioElement>(null);
   useEffect(() => {
     if (ref.current && track) {
-      ref.current.srcObject = new MediaStream([track]);
+      const currentStream = ref.current.srcObject as MediaStream;
+      if (currentStream && currentStream.getTracks()[0] === track) {
+        return; // Track is already assigned
+      }
+      
+      const stream = new MediaStream([track]);
+      ref.current.srcObject = stream;
+      
+      const playPromise = ref.current.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => {}); // Suppress DOMException
+      }
     }
   }, [track]);
   return <audio ref={ref} autoPlay playsInline />;
 }
 
+function useAudioVolume(track: any) {
+  const [volume, setVolume] = useState(0);
+
+  useEffect(() => {
+    if (!track) {
+      setVolume(0);
+      return;
+    }
+
+    try {
+      const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const stream = new MediaStream([track]);
+      const source = audioContext.createMediaStreamSource(stream);
+      const analyser = audioContext.createAnalyser();
+      
+      analyser.fftSize = 256;
+      source.connect(analyser);
+      
+      const dataArray = new Uint8Array(analyser.frequencyBinCount);
+      let animationFrame: number;
+      
+      const updateVolume = () => {
+        analyser.getByteFrequencyData(dataArray);
+        let sum = 0;
+        for (let i = 0; i < dataArray.length; i++) {
+          sum += dataArray[i];
+        }
+        const avg = sum / dataArray.length;
+        setVolume(avg);
+        animationFrame = requestAnimationFrame(updateVolume);
+      };
+      
+      updateVolume();
+      
+      return () => {
+        cancelAnimationFrame(animationFrame);
+        source.disconnect();
+        analyser.disconnect();
+        audioContext.close().catch(console.error);
+      };
+    } catch (e) {
+      console.warn("AudioContext failed:", e);
+      return () => {};
+    }
+  }, [track]);
+
+  return volume;
+}
+
+function AvatarWithGlow({ name, avatarUrl, track }: { name: string, avatarUrl?: string, track?: any }) {
+  const volume = useAudioVolume(track);
+  const isTalking = volume > 10;
+  
+  const glowIntensity = Math.min(1, volume / 100);
+  const glowStyle = isTalking ? {
+    boxShadow: `0 0 ${20 + glowIntensity * 40}px ${10 + glowIntensity * 20}px rgba(20, 184, 166, ${0.4 + glowIntensity * 0.4})`,
+    transition: 'box-shadow 0.1s ease-out'
+  } : {
+    transition: 'box-shadow 0.3s ease-in'
+  };
+
+  return (
+    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#111] to-black">
+       {avatarUrl ? (
+         <img style={glowStyle} src={avatarUrl} alt={name} className={`w-24 h-24 rounded-full border-2 ${isTalking ? 'border-green-400' : 'border-green-500/20'} object-cover z-10`} />
+       ) : (
+         <div style={glowStyle} className={`w-20 h-20 rounded-full ${isTalking ? 'bg-green-500/40 text-white border-green-400' : 'bg-green-500/20 text-green-400 border-green-500/20'} flex items-center justify-center text-2xl font-bold border z-10`}>
+           {name.charAt(0)}
+         </div>
+       )}
+    </div>
+  );
+}
+
 function MediaGrid({ 
-  localCamTrack, localScreenTrack, camEnabled, screenEnabled, micEnabled, username, userImageUrl, peers, maximizedUser, setMaximizedUser
+  localCamTrack, localScreenTrack, localMicTrack, camEnabled, screenEnabled, micEnabled, username, userImageUrl, peers, maximizedUser, setMaximizedUser
 }: any) {
   const tiles: { id: string, content: React.ReactNode, isScreen?: boolean }[] = [];
 
@@ -406,15 +509,7 @@ function MediaGrid({
         {camEnabled && localCamTrack ? (
           <VideoPlayer track={localCamTrack} isLocal={true} />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#111] to-black">
-             {userImageUrl ? (
-               <img src={userImageUrl} alt={username} className="w-24 h-24 rounded-full border-2 border-teal-500/20 object-cover" />
-             ) : (
-               <div className="w-20 h-20 rounded-full bg-teal-500/20 text-teal-400 flex items-center justify-center text-2xl font-bold border border-teal-500/20">
-                 {username.charAt(0)}
-               </div>
-             )}
-          </div>
+          <AvatarWithGlow name={username} avatarUrl={userImageUrl} track={localMicTrack} />
         )}
         <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-white text-sm font-medium flex items-center gap-2">
           {username} (You)
@@ -435,7 +530,7 @@ function MediaGrid({
       content: (
         <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/40 border border-white/5 group">
           <VideoPlayer track={localScreenTrack} isLocal={true} isScreen={true} />
-          <div className="absolute top-4 left-4 bg-teal-500 text-white px-3 py-1 rounded-lg text-xs font-bold animate-pulse shadow-[0_0_10px_rgba(20,184,166,0.5)]">
+          <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]">
             You are sharing your screen
           </div>
           <button onClick={() => setMaximizedUser(maximizedUser === 'local-screen' ? null : 'local-screen')} className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-opacity">
@@ -455,15 +550,7 @@ function MediaGrid({
           {peer.videoTrack ? (
             <VideoPlayer track={peer.videoTrack.track} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-[#111] to-black">
-               {peer.avatarUrl ? (
-                 <img src={peer.avatarUrl} alt={peer.name} className="w-24 h-24 rounded-full border-2 border-blue-500/20 object-cover" />
-               ) : (
-                 <div className="w-20 h-20 rounded-full bg-blue-500/20 text-blue-400 flex items-center justify-center text-2xl font-bold border border-blue-500/20">
-                   {peer.name.charAt(0)}
-                 </div>
-               )}
-            </div>
+            <AvatarWithGlow name={peer.name} avatarUrl={peer.avatarUrl} track={peer.audioTrack?.track} />
           )}
           {peer.audioTrack && <AudioPlayer track={peer.audioTrack.track} />}
           <div className="absolute bottom-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/10 text-white text-sm font-medium flex items-center gap-2">
@@ -484,7 +571,7 @@ function MediaGrid({
         content: (
           <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black border border-white/5 group">
             <VideoPlayer track={peer.screenTrack.track} isScreen={true} />
-            <div className="absolute top-4 left-4 bg-teal-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
+            <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold">
               {peer.name}'s Screen
             </div>
             <button onClick={() => setMaximizedUser(maximizedUser === `${peer.id}-screen` ? null : `${peer.id}-screen`)} className="absolute top-4 right-4 p-2 bg-black/50 hover:bg-black/80 rounded-lg text-white opacity-0 group-hover:opacity-100 transition-opacity">
@@ -501,7 +588,7 @@ function MediaGrid({
     const sideTiles = tiles.filter(t => t.id !== mainTile.id);
     
     return (
-      <div className="flex-1 min-h-0 bg-[#0a0a0a] rounded-3xl border border-white/5 overflow-hidden p-4 flex flex-col md:flex-row gap-4">
+      <div className="flex-1 min-h-0 bg-[#0b120c] rounded-3xl border border-white/5 overflow-hidden p-4 flex flex-col md:flex-row gap-4">
         <div className="flex-1 h-full min-w-0">
           {mainTile.content}
         </div>
@@ -519,7 +606,7 @@ function MediaGrid({
   }
 
   return (
-    <div className="flex-1 min-h-0 bg-[#0a0a0a] rounded-3xl border border-white/5 overflow-hidden p-4">
+    <div className="flex-1 min-h-0 bg-[#0b120c] rounded-3xl border border-white/5 overflow-hidden p-4">
       <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
         {tiles.map(tile => (
           <div key={tile.id} className={tile.isScreen ? "lg:col-span-2" : ""}>

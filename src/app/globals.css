@@ -6,14 +6,14 @@
 }
 
 :root {
-  --background: #000000;
-  --foreground: #00FF41;
+  --background: #0b120c;
+  --foreground: #e5e7eb;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-family: 'Inter', system-ui, sans-serif;
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
@@ -29,19 +29,28 @@ body {
   scrollbar-width: none;
 }
 
-/* Cyberpunk Terminal Scrollbar */
+/* Hack The Box Cyber Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #050505;
-  border-left: 1px solid rgba(0, 255, 65, 0.2);
+  background: #0b120c;
+  border-left: 1px solid rgba(34, 197, 94, 0.1);
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 65, 0.4);
-  border-radius: 0px;
+  background: rgba(34, 197, 94, 0.4);
+  border-radius: 4px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 65, 0.8);
+  background: rgba(34, 197, 94, 0.8);
+}
+
+/* Hide Clerk Watermark */
+.cl-watermark,
+a[href*="clerk.dev"],
+a[href*="clerk.com"] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
 }

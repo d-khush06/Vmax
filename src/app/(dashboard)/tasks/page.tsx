@@ -78,7 +78,7 @@ function AddTaskModal({ onClose, onAdd }: AddTaskModalProps) {
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 16 }}
-        className="w-full max-w-md bg-[#0e0e10] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+        className="w-full max-w-md bg-[#0b120c] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <h3 className="font-semibold text-white text-base">Add New Task</h3>
@@ -132,7 +132,7 @@ function AddTaskModal({ onClose, onAdd }: AddTaskModalProps) {
             <button
               type="submit"
               disabled={!content.trim() || loading}
-              className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-400 text-white text-sm font-semibold transition-all disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {loading ? 'Adding...' : 'Add Task'}
             </button>
@@ -192,7 +192,7 @@ export default function KanbanPage() {
           </div>
           <button
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(20,184,166,0.3)]"
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(34,197,94,0.3)]"
           >
             <Plus size={16} />
             Add Task

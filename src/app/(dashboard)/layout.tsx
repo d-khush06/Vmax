@@ -60,12 +60,12 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
   };
 
   return (
-    <div className="relative flex h-screen w-full bg-[#121212] text-gray-200 overflow-hidden font-sans">
+    <div className="relative flex h-screen w-full bg-[#0b120c] text-gray-200 overflow-hidden font-sans">
       
       {/* Ambient Glass Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
-        <div className="absolute top-[10%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-teal-500/5 blur-[120px]" />
-        <div className="absolute bottom-[10%] right-[20%] w-[40vw] h-[40vw] rounded-full bg-blue-500/5 blur-[100px]" />
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#0b120c]">
+        <div className="absolute top-[10%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-green-500/5 blur-[120px]" />
+        <div className="absolute bottom-[10%] right-[20%] w-[40vw] h-[40vw] rounded-full bg-emerald-500/5 blur-[100px]" />
       </div>
 
       {/* App Container */}
@@ -96,7 +96,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                 className={`w-full h-10 flex items-center ${isSidebarOpen ? 'justify-between px-3' : 'justify-center'} rounded-xl hover:bg-white/5 transition-colors cursor-pointer outline-none group`}
               >
                 <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-6 h-6 rounded-md bg-teal-500 flex items-center justify-center shrink-0 text-white font-bold text-[10px]">
+                  <div className="w-6 h-6 rounded-md bg-green-500 flex items-center justify-center shrink-0 text-black font-bold text-[10px]">
                      {team?.name?.substring(0, 2).toUpperCase() || 'VM'}
                   </div>
                   <AnimatePresence>
@@ -146,7 +146,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                                   {t.name}
                                 </span>
                               </div>
-                              {team?._id === t._id && <Check size={14} className="text-teal-400 shrink-0" />}
+                              {team?._id === t._id && <Check size={14} className="text-green-400 shrink-0" />}
                             </button>
                           ))}
                         </div>
@@ -192,7 +192,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                 const isActive = pathname?.includes(app.href);
                 return (
                   <Link key={app.name} href={app.href} className="relative group">
-                    <div className={`relative z-10 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 border-l-2 ${isActive ? 'text-teal-400 bg-white/[0.05] border-teal-400 shadow-[inset_0_0_20px_rgba(255,255,255,0.02)]' : 'text-gray-400 group-hover:bg-white/[0.03] group-hover:text-gray-200 border-transparent'}`}>
+                    <div className={`relative z-10 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 border-l-2 ${isActive ? 'text-black bg-green-500 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 'text-gray-400 group-hover:bg-white/[0.03] group-hover:text-gray-200 border-transparent'}`}>
                       <app.icon size={18} className="shrink-0" />
                       <AnimatePresence>
                         {isSidebarOpen && (
@@ -202,7 +202,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                             exit={{ opacity: 0, width: 0 }}
                             className="overflow-hidden whitespace-nowrap flex-1"
                           >
-                            <span className={`text-sm ${isActive ? 'font-medium' : 'font-medium'}`}>{app.name}</span>
+                            <span className={`text-sm ${isActive ? 'font-bold' : 'font-medium'}`}>{app.name}</span>
                           </motion.div>
                         )}
                       </AnimatePresence>
@@ -235,7 +235,7 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
                 </button>
                 <div className="relative group w-full max-w-md hidden sm:block">
                   <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-gray-300 transition-colors" />
-                  <input type="text" placeholder="Search..." className="w-full bg-white/[0.03] border border-white/10 rounded-lg py-1.5 pl-9 pr-4 text-sm text-gray-200 focus:outline-none focus:border-teal-500/50 focus:bg-white/[0.05] transition-all placeholder-gray-500 shadow-inner" />
+                  <input type="text" placeholder="Search..." className="w-full bg-white/[0.03] border border-white/10 rounded-lg py-1.5 pl-9 pr-4 text-sm text-gray-200 focus:outline-none focus:border-green-500/50 focus:bg-white/[0.05] transition-all placeholder-gray-500 shadow-inner" />
                 </div>
               </div>
               

@@ -8,30 +8,34 @@ const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL || "http
 
 export function ConvexClientProvider({ children }: { children: React.ReactNode }) {
   const clerkAppearance: any = {
+    layout: {
+      socialButtonsPlacement: 'top',
+      logoImageUrl: '/logo.png',
+    },
     variables: {
-      colorPrimary: "#00FF41", // Phosphor green
-      colorBackground: "#050505", // Terminal black
-      colorText: "#00FF41",
-      colorInputBackground: "#0A0A0A",
-      colorInputText: "#00FFFF",
-      fontFamily: "'JetBrains Mono', 'Fira Code', monospace",
+      colorPrimary: "#22c55e", // green-500
+      colorBackground: "#0b120c", // dark green
+      colorText: "#e5e7eb", // gray-200
+      colorInputBackground: "#111a12", // slightly lighter dark green
+      colorInputText: "#ffffff",
+      fontFamily: "'Inter', sans-serif",
     },
     elements: {
-      card: "bg-[#050505] border border-[#00FF41]/30 shadow-[0_0_20px_rgba(0,255,65,0.15)] rounded-none",
-      headerTitle: "text-[#00FF41] text-2xl font-bold tracking-widest uppercase",
-      headerSubtitle: "text-[#00FF41]/70 text-xs tracking-widest",
-      socialButtonsBlockButton: "bg-[#0A0A0A] border border-[#00FF41]/30 hover:bg-[#00FF41]/10 text-[#00FFFF] transition-all rounded-none",
-      socialButtonsBlockButtonText: "font-mono text-xs tracking-widest",
-      dividerLine: "bg-[#00FF41]/30",
-      dividerText: "text-[#00FF41]/50 font-mono text-[10px]",
-      formFieldLabel: "text-[#00FF41]/80 text-xs font-mono uppercase tracking-widest",
-      formFieldInput: "bg-[#000000] border border-[#00FF41]/40 text-[#00FFFF] placeholder:text-[#00FF41]/30 focus:border-[#00FFFF] focus:bg-[#0A0A0A] transition-all rounded-none font-mono",
-      primaryButton: "bg-[#00FF41]/20 border border-[#00FF41] hover:bg-[#00FF41]/40 text-[#00FF41] font-bold transition-all shadow-[0_0_15px_rgba(0,255,65,0.2)] rounded-none tracking-widest uppercase",
-      footerActionText: "text-[#00FF41]/60 font-mono text-xs",
-      footerActionLink: "text-[#00FFFF] hover:text-[#00FFFF]/80 font-bold transition-colors font-mono tracking-widest",
-      identityPreviewText: "text-[#00FF41] font-mono",
-      identityPreviewEditButton: "text-[#00FFFF] hover:text-[#00FFFF]/80",
-      formResendCodeLink: "text-[#00FFFF] hover:text-[#00FFFF]/80 font-mono text-xs",
+      card: "bg-[#0b120c] border border-green-500/30 shadow-[0_0_40px_rgba(34,197,94,0.2)] rounded-2xl",
+      headerTitle: "text-white text-2xl font-bold tracking-tight",
+      headerSubtitle: "text-green-400/70 text-sm",
+      socialButtonsBlockButton: "bg-green-500/10 border border-green-500/20 hover:bg-green-500/20 text-white transition-all rounded-xl",
+      socialButtonsBlockButtonText: "font-semibold text-sm",
+      dividerLine: "bg-green-500/20",
+      dividerText: "text-gray-500 text-sm",
+      formFieldLabel: "text-gray-300 text-xs font-semibold uppercase tracking-wide",
+      formFieldInput: "bg-[#0b120c] border border-green-500/30 text-white placeholder:text-gray-600 focus:border-green-500 focus:bg-green-500/5 transition-all rounded-xl",
+      primaryButton: "bg-green-500 hover:bg-green-400 text-black font-bold transition-all shadow-[0_0_20px_rgba(34,197,94,0.4)] rounded-xl",
+      footerActionText: "text-gray-400 text-sm",
+      footerActionLink: "text-green-400 hover:text-green-300 font-semibold transition-colors",
+      identityPreviewText: "text-white font-medium",
+      identityPreviewEditButton: "text-green-400 hover:text-green-300",
+      formResendCodeLink: "text-green-400 hover:text-green-300 text-sm font-semibold",
     }
   };
 

@@ -112,14 +112,14 @@ export default function FilesPage() {
     <div className="h-full w-full flex flex-col p-6 relative overflow-hidden" onClick={() => setActiveMenu(null)}>
       {/* Ambient Glass Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
-        <div className="absolute top-[30%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-teal-500/10 blur-[130px]" />
+        <div className="absolute top-[30%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-green-500/10 blur-[130px]" />
         <div className="absolute bottom-[20%] right-[30%] w-[40vw] h-[40vw] rounded-full bg-blue-500/10 blur-[120px]" />
       </div>
 
       {/* Toast Notification */}
       {toastMsg && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-teal-500/20 border border-teal-500/50 text-teal-100 px-4 py-2 rounded-full shadow-[0_10px_30px_rgba(20,184,166,0.3)] flex items-center gap-2 z-50 animate-in fade-in slide-in-from-top-4 backdrop-blur-md">
-          <Check size={16} className="text-teal-400" />
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-green-500/20 border border-green-500/50 text-green-100 px-4 py-2 rounded-full shadow-[0_10px_30px_rgba(34,197,94,0.3)] flex items-center gap-2 z-50 animate-in fade-in slide-in-from-top-4 backdrop-blur-md">
+          <Check size={16} className="text-green-400" />
           <span className="text-sm font-medium">{toastMsg}</span>
         </div>
       )}
@@ -128,8 +128,8 @@ export default function FilesPage() {
         <div className="flex items-center gap-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-200 tracking-tight flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center shadow-inner">
-                <Folder size={18} className="text-teal-400" />
+              <div className="w-10 h-10 rounded-xl bg-green-500/10 border border-green-500/20 flex items-center justify-center shadow-inner">
+                <Folder size={18} className="text-green-400" />
               </div>
               Resource Center
             </h2>
@@ -139,14 +139,14 @@ export default function FilesPage() {
           <div className="hidden md:flex items-center gap-3 ml-4 pl-6 border-l border-white/10 h-10">
             <button 
               onClick={() => setFilterType(filterType === 'all' ? 'image' : filterType === 'image' ? 'pdf' : 'all')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${filterType !== 'all' ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${filterType !== 'all' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>
               Filter: {filterType === 'all' ? 'All' : filterType === 'image' ? 'Images' : 'PDFs'}
             </button>
             <button 
               onClick={() => setSortOrder(sortOrder === 'desc' ? 'asc' : 'desc')}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${sortOrder === 'asc' ? 'bg-teal-500/20 border-teal-500/50 text-teal-400' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${sortOrder === 'asc' ? 'bg-green-500/20 border-green-500/50 text-green-400' : 'bg-black/20 border-white/5 text-gray-400 hover:text-white hover:bg-white/5'}`}
             >
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 5h10"/><path d="M11 9h7"/><path d="M11 13h4"/><path d="M3 17l3 3 3-3"/><path d="M6 18V4"/></svg>
               Sort: {sortOrder === 'desc' ? 'Newest' : 'Oldest'}
@@ -163,7 +163,7 @@ export default function FilesPage() {
           <button 
             onClick={handleUploadClick}
             disabled={isUploading}
-            className="bg-teal-500 hover:bg-teal-400 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_rgba(20,184,166,0.3)] flex items-center gap-2"
+            className="bg-green-500 hover:bg-green-400 disabled:opacity-50 text-white px-4 py-2 rounded-lg text-sm font-medium transition-all shadow-[0_0_15px_rgba(34,197,94,0.3)] flex items-center gap-2"
           >
             {isUploading && <Loader2 size={16} className="animate-spin" />}
             {isUploading ? 'Uploading...' : 'Upload File'}
@@ -236,7 +236,7 @@ export default function FilesPage() {
                   </button>
 
                   {activeMenu === file._id && (
-                    <div className="absolute top-10 right-0 w-36 bg-[#1a1a24] border border-white/10 rounded-xl shadow-2xl py-1 z-50 overflow-hidden animate-in fade-in zoom-in-95">
+                    <div className="absolute top-10 right-0 w-36 bg-[#0b120c] border border-white/10 rounded-xl shadow-2xl py-1 z-50 overflow-hidden animate-in fade-in zoom-in-95">
                       <button 
                         onClick={() => { setEditingFile({ id: file._id, name: file.name }); setActiveMenu(null); }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"

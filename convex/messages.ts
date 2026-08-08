@@ -12,10 +12,18 @@ export const list = query({
     // Populate user info for each message
     const messagesWithUsers = await Promise.all(
       messages.map(async (msg) => {
-        const user = await ctx.db
-          .query("users")
-          .withIndex("by_clerkId", (q) => q.eq("clerkId", msg.clerkId))
-          .first();
+        let user = null;
+        if (msg.clerkId) {
+          user = await ctx.db
+            .query("users")
+            .withIndex("by_clerkId", (q) => q.eq("clerkId", msg.clerkId as string))
+            .first();
+        }
+        
+        if (!user && (msg as any).userId) {
+          const allUsers = await ctx.db.query("users").collect();
+          user = allUsers.find(u => u.tokenIdentifier === (msg as any).userId || u.clerkId === (msg as any).userId) || null;
+        }
         
         let fileUrl = null;
         if (msg.fileStorageId) {

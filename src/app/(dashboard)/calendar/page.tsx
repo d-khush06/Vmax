@@ -130,7 +130,7 @@ function AddEventModal({ onClose, onAdd }: AddEventModalProps) {
             <button
               type="submit"
               disabled={loading}
-              className="flex-1 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-white text-sm font-semibold transition-all disabled:opacity-40"
+              className="flex-1 py-2.5 rounded-xl bg-green-500 hover:bg-green-400 text-white text-sm font-semibold transition-all disabled:opacity-40"
             >
               {loading ? 'Saving...' : 'Add Event'}
             </button>
@@ -174,7 +174,7 @@ export default function CalendarPage() {
           </div>
           <button
             onClick={() => setShowModal(true)}
-            className="flex items-center gap-2 bg-teal-500 hover:bg-teal-400 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(20,184,166,0.3)]"
+            className="flex items-center gap-2 bg-green-500 hover:bg-green-400 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-[0_0_15px_rgba(34,197,94,0.3)]"
           >
             <Plus size={16} />
             Add Event
@@ -185,7 +185,7 @@ export default function CalendarPage() {
       {eventsQuery === undefined ? (
         <div className="flex-1 flex items-center justify-center text-gray-500">Loading Calendar...</div>
       ) : (
-        <div className="flex-1 overflow-hidden bg-[#0a0a0c] rounded-2xl border border-white/5 shadow-2xl p-5 relative">
+        <div className="flex-1 overflow-hidden bg-[#0b120c] rounded-2xl border border-white/5 shadow-2xl p-5 relative">
           <style dangerouslySetInnerHTML={{__html: `
             .rbc-calendar { font-family: 'Inter', sans-serif; color: #a1a1aa; border: none; background: transparent; }
             .rbc-toolbar { margin-bottom: 20px; }

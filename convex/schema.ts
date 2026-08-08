@@ -3,10 +3,13 @@ import { v } from "convex/values";
 
 export default defineSchema({
   users: defineTable({
-    clerkId: v.string(),
+    clerkId: v.optional(v.string()),
     email: v.string(),
     full_name: v.optional(v.string()),
     avatar_url: v.optional(v.string()),
+    name: v.optional(v.string()),
+    tokenIdentifier: v.optional(v.string()),
+    avatarUrl: v.optional(v.string()),
   }).index("by_clerkId", ["clerkId"]),
 
   teams: defineTable({
@@ -17,7 +20,8 @@ export default defineSchema({
 
   teamMembers: defineTable({
     teamId: v.id("teams"),
-    clerkId: v.string(),
+    clerkId: v.optional(v.string()),
+    userId: v.optional(v.string()),
     role: v.string(), // 'owner', 'admin', 'member'
   })
     .index("by_teamId", ["teamId"])
@@ -32,13 +36,23 @@ export default defineSchema({
 
   messages: defineTable({
     teamId: v.id("teams"),
-    clerkId: v.string(),
+    clerkId: v.optional(v.string()),
+    userId: v.optional(v.string()),
+    channelId: v.optional(v.string()),
     content: v.string(),
     fileStorageId: v.optional(v.id("_storage")),
     fileName: v.optional(v.string()),
     fileType: v.optional(v.string()),
     isEdited: v.optional(v.boolean()),
   }).index("by_teamId", ["teamId"]),
+
+  typing_indicators: defineTable({
+    teamId: v.id("teams"),
+    clerkId: v.string(),
+    isTyping: v.boolean(),
+    updatedAt: v.number(),
+  }).index("by_team_and_user", ["teamId", "clerkId"])
+    .index("by_teamId", ["teamId"]),
 
   whiteboards: defineTable({
     teamId: v.id("teams"),
@@ -50,7 +64,8 @@ export default defineSchema({
     title: v.string(),
     description: v.optional(v.string()),
     status: v.string(), // e.g. 'todo', 'in-progress', 'done'
-    clerkId: v.string(),
+    clerkId: v.optional(v.string()),
+    userId: v.optional(v.string()),
   }).index("by_teamId", ["teamId"]),
 
   files: defineTable({
@@ -59,7 +74,8 @@ export default defineSchema({
     name: v.string(),
     size: v.number(),
     type: v.string(),
-    uploaderId: v.string(), // clerkId
+    uploaderId: v.optional(v.string()), // clerkId
+    userId: v.optional(v.string()), // legacy field
   }).index("by_teamId", ["teamId"]),
 
   calendar_events: defineTable({
@@ -68,6 +84,7 @@ export default defineSchema({
     description: v.optional(v.string()),
     startTime: v.string(),
     endTime: v.string(),
-    clerkId: v.string(),
+    clerkId: v.optional(v.string()),
+    userId: v.optional(v.string()),
   }).index("by_teamId", ["teamId"]),
 });

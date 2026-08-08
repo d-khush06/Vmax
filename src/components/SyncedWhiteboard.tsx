@@ -36,6 +36,22 @@ export default function SyncedWhiteboard({ teamId }: SyncedWhiteboardProps) {
     }
   }, [whiteboardData, isLoaded, store]);
 
+  // Sync remote changes from other users
+  useEffect(() => {
+    if (!isLoaded || !whiteboardData?.snapshot) return;
+    
+    // If the snapshot from Convex is different from what we last saved/loaded, it means someone else updated it!
+    if (whiteboardData.snapshot !== lastSavedSnapshot.current) {
+      try {
+        const snapshot = JSON.parse(whiteboardData.snapshot);
+        loadSnapshot(store, snapshot);
+        lastSavedSnapshot.current = whiteboardData.snapshot;
+      } catch (e) {
+        console.error("Failed to sync remote whiteboard changes", e);
+      }
+    }
+  }, [whiteboardData, isLoaded, store]);
+
   // Save changes automatically (debounced)
   useEffect(() => {
     if (!isLoaded) return;
@@ -65,15 +81,15 @@ export default function SyncedWhiteboard({ teamId }: SyncedWhiteboardProps) {
 
   if (!isLoaded) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-[#0a0a0a]">
-        <div className="animate-spin w-10 h-10 border-2 border-teal-500/20 border-t-teal-400 rounded-full shadow-[0_0_15px_rgba(45,212,191,0.2)]"></div>
-        <p className="text-[13px] font-medium text-teal-100/70 tracking-wider">LOADING CANVAS...</p>
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-[#0b120c]">
+        <div className="animate-spin w-10 h-10 border-2 border-emerald-500/20 border-t-emerald-400 rounded-full shadow-[0_0_15px_rgba(52,211,153,0.2)]"></div>
+        <p className="text-[13px] font-medium text-emerald-100/70 tracking-wider">LOADING CANVAS...</p>
       </div>
     );
   }
 
   return (
-    <div className="w-full h-full" style={{ '--color-background': '#0a0a0a' } as any}>
+    <div className="w-full h-full" style={{ '--color-background': '#0b120c' } as any}>
       <Tldraw store={store} />
     </div>
   );
