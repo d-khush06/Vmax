@@ -13,7 +13,7 @@ export default function FilesPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isUploading, setIsUploading] = useState(false);
 
-  const files = useQuery(api.files.listFiles, team ? { teamId: team._id } : "skip");
+  const files = useQuery(api.files.list, team ? { teamId: team._id } : "skip");
   const generateUploadUrl = useMutation(api.files.generateUploadUrl);
   const saveFile = useMutation(api.files.saveFile);
   const deleteFile = useMutation(api.files.deleteFile);
@@ -58,7 +58,7 @@ export default function FilesPage() {
         name: file.name,
         size: file.size,
         type: file.type || 'unknown',
-        clerkId: user.id
+        uploaderId: user.id
       });
 
       showToast(`Successfully uploaded ${file.name}`);
@@ -87,7 +87,7 @@ export default function FilesPage() {
     e.preventDefault();
     if (!editingFile) return;
     try {
-      await renameFile({ fileId: editingFile.id as any, newName: editingFile.name });
+      await renameFile({ fileId: editingFile.id as any, name: editingFile.name });
       showToast("File renamed successfully");
     } catch (error) {
       console.error(error);
@@ -222,7 +222,7 @@ export default function FilesPage() {
                     <span className="font-medium text-gray-200 group-hover:text-white transition-colors truncate" title={file.name}>{file.name}</span>
                   )}
                 </div>
-                <div className="col-span-3 text-sm text-gray-400">{new Date(file.created_at).toLocaleDateString()}</div>
+                <div className="col-span-3 text-sm text-gray-400">{new Date(file._creationTime).toLocaleDateString()}</div>
                 <div className="col-span-2 text-sm text-gray-400">{formatSize(file.size)}</div>
                 <div className="col-span-1 flex items-center justify-end gap-2 relative">
                   <a href={file.url || '#'} target="_blank" rel="noopener noreferrer" className="p-2 bg-white/5 hover:bg-white/20 rounded-md text-gray-400 hover:text-white transition-colors" title="Download">

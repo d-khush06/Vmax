@@ -17,9 +17,11 @@ export default function AuroraLayout({ children }: { children: React.ReactNode }
   const router = useRouter();
   const { team, myTeams, switchTeam, user, teammates, onlineUsers, loading } = useTeam();
 
+  const voiceRoomId = team?.name ? `${team.name.toLowerCase().replace(/\\s+/g, '-')}-voice` : 'general-voice';
+
   const dockApps = [
     { name: 'Chat', icon: MessageSquare, href: '/chat/general' },
-    { name: 'Voice', icon: Mic, href: '/voice/general-voice' },
+    { name: 'Voice', icon: Mic, href: `/voice/${voiceRoomId}` },
     { name: 'Files', icon: Folder, href: '/files' },
     { name: 'Calendar', icon: Calendar, href: '/calendar' },
     { name: 'Tasks', icon: Kanban, href: '/tasks' },

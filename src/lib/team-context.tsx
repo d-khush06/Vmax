@@ -43,7 +43,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
-  const myTeams = useQuery(api.teams.getMyTeams, { clerkId: user?.id });
+  const myTeams = useQuery(api.teams.getMyTeams, { clerkId: user?.id || "" });
   
   // Determine the active team
   let myTeam = null;

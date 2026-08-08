@@ -3,65 +3,71 @@ import { v } from "convex/values";
 
 export default defineSchema({
   users: defineTable({
-    tokenIdentifier: v.string(), // Clerk User ID (subject)
-    name: v.string(),
+    clerkId: v.string(),
     email: v.string(),
-    avatarUrl: v.string(),
-  }).index("by_token", ["tokenIdentifier"]),
+    full_name: v.optional(v.string()),
+    avatar_url: v.optional(v.string()),
+  }).index("by_clerkId", ["clerkId"]),
 
   teams: defineTable({
     name: v.string(),
     joinCode: v.string(),
-    createdBy: v.id("users"),
+    createdBy: v.string(), // clerkId
   }).index("by_joinCode", ["joinCode"]),
 
   teamMembers: defineTable({
     teamId: v.id("teams"),
-    userId: v.id("users"),
-    role: v.string(),
+    clerkId: v.string(),
+    role: v.string(), // 'owner', 'admin', 'member'
   })
-    .index("by_team", ["teamId"])
-    .index("by_user", ["userId"])
-    .index("by_team_and_user", ["teamId", "userId"]),
+    .index("by_teamId", ["teamId"])
+    .index("by_clerkId", ["clerkId"])
+    .index("by_team_and_user", ["teamId", "clerkId"]),
+
+  channels: defineTable({
+    teamId: v.id("teams"),
+    name: v.string(),
+    type: v.string(), // 'text', 'voice'
+  }).index("by_teamId", ["teamId"]),
 
   messages: defineTable({
     teamId: v.id("teams"),
-    userId: v.id("users"),
-    channelId: v.string(),
+    clerkId: v.string(),
     content: v.string(),
-    gifUrl: v.optional(v.string()),
     fileStorageId: v.optional(v.id("_storage")),
     fileName: v.optional(v.string()),
     fileType: v.optional(v.string()),
     isEdited: v.optional(v.boolean()),
-  }).index("by_team_and_channel", ["teamId", "channelId"]),
-
-  kanbanTasks: defineTable({
-    teamId: v.id("teams"),
-    createdBy: v.id("users"),
-    content: v.string(),
-    columnId: v.string(), // e.g. "todo", "in_progress", "done"
-  }).index("by_team", ["teamId"]),
-
-  calendarEvents: defineTable({
-    teamId: v.id("teams"),
-    createdBy: v.id("users"),
-    title: v.string(),
-    startTime: v.string(), // ISO String
-    endTime: v.string(), // ISO String
-  }).index("by_team", ["teamId"]),
-
-  files: defineTable({
-    teamId: v.id("teams"),
-    userId: v.id("users"),
-    storageId: v.id("_storage"),
-    name: v.string(),
-    size: v.number(),
-    type: v.string(), // e.g. "image/png", "application/pdf"
-  }).index("by_team", ["teamId"]),
+  }).index("by_teamId", ["teamId"]),
 
   whiteboards: defineTable({
     teamId: v.id("teams"),
-    snapshot: v.string(), // Serialized JSON of the TLDraw store
-  }).index("by_team", ["teamId"]),
+    snapshot: v.string(),
+  }).index("by_teamId", ["teamId"]),
+
+  kanban_tasks: defineTable({
+    teamId: v.id("teams"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    status: v.string(), // e.g. 'todo', 'in-progress', 'done'
+    clerkId: v.string(),
+  }).index("by_teamId", ["teamId"]),
+
+  files: defineTable({
+    teamId: v.id("teams"),
+    storageId: v.id("_storage"),
+    name: v.string(),
+    size: v.number(),
+    type: v.string(),
+    uploaderId: v.string(), // clerkId
+  }).index("by_teamId", ["teamId"]),
+
+  calendar_events: defineTable({
+    teamId: v.id("teams"),
+    title: v.string(),
+    description: v.optional(v.string()),
+    startTime: v.string(),
+    endTime: v.string(),
+    clerkId: v.string(),
+  }).index("by_teamId", ["teamId"]),
 });

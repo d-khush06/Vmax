@@ -13,7 +13,6 @@ import type * as files from "../files.js";
 import type * as kanban from "../kanban.js";
 import type * as messages from "../messages.js";
 import type * as teams from "../teams.js";
-import type * as users from "../users.js";
 import type * as whiteboards from "../whiteboards.js";
 
 import type {
@@ -28,7 +27,6 @@ declare const fullApi: ApiFromModules<{
   kanban: typeof kanban;
   messages: typeof messages;
   teams: typeof teams;
-  users: typeof users;
   whiteboards: typeof whiteboards;
 }>;
 

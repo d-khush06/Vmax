@@ -1,11 +1,25 @@
-import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
 
-export const generateUploadUrl = mutation({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.storage.generateUploadUrl();
-  },
+export const list = query({
+  args: { teamId: v.id("teams") },
+  handler: async (ctx, args) => {
+    const files = await ctx.db
+      .query("files")
+      .withIndex("by_teamId", (q) => q.eq("teamId", args.teamId))
+      .collect();
+      
+    return await Promise.all(
+      files.map(async (file) => ({
+        ...file,
+        url: await ctx.storage.getUrl(file.storageId),
+      }))
+    );
+  }
+});
+
+export const generateUploadUrl = mutation(async (ctx) => {
+  return await ctx.storage.generateUploadUrl();
 });
 
 export const saveFile = mutation({
@@ -15,77 +29,37 @@ export const saveFile = mutation({
     name: v.string(),
     size: v.number(),
     type: v.string(),
-    clerkId: v.optional(v.string())
+    uploaderId: v.string(),
   },
   handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    const subject = identity?.subject || args.clerkId;
-    if (!subject) throw new Error("Unauthenticated");
-
-    let user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) => q.eq("tokenIdentifier", subject))
-      .first();
-
-    if (!user && args.clerkId) {
-      // Fallback: search for user where tokenIdentifier includes clerkId
-      const allUsers = await ctx.db.query("users").collect();
-      user = allUsers.find(u => u.tokenIdentifier.includes(args.clerkId!)) || null;
-    }
-
-    if (!user) throw new Error("User not found");
-
-    await ctx.db.insert("files", {
+    return await ctx.db.insert("files", {
       teamId: args.teamId,
-      userId: user._id,
       storageId: args.storageId,
       name: args.name,
       size: args.size,
       type: args.type,
+      uploaderId: args.uploaderId,
     });
   },
 });
 
-export const listFiles = query({
-  args: { teamId: v.optional(v.id("teams")) },
-  handler: async (ctx, args) => {
-    if (!args.teamId) return [];
-
-    const files = await ctx.db
-      .query("files")
-      .withIndex("by_team", (q) => q.eq("teamId", args.teamId!))
-      .order("desc")
-      .collect();
-
-    return await Promise.all(
-      files.map(async (f) => {
-        const user = await ctx.db.get(f.userId);
-        const url = await ctx.storage.getUrl(f.storageId);
-        return {
-          ...f,
-          url,
-          users: {
-            full_name: user?.name,
-            avatar_url: user?.avatarUrl,
-          },
-          created_at: f._creationTime,
-        };
-      })
-    );
-  },
-});
-
 export const deleteFile = mutation({
-  args: { fileId: v.id("files"), storageId: v.id("_storage") },
+  args: {
+    fileId: v.id("files"),
+    storageId: v.id("_storage"),
+  },
   handler: async (ctx, args) => {
-    await ctx.db.delete(args.fileId);
     await ctx.storage.delete(args.storageId);
+    await ctx.db.delete(args.fileId);
   },
 });
 
 export const renameFile = mutation({
-  args: { fileId: v.id("files"), newName: v.string() },
-  handler: async (ctx, args) => {
-    await ctx.db.patch(args.fileId, { name: args.newName });
+  args: {
+    fileId: v.id("files"),
+    name: v.string(),
   },
+  handler: async (ctx, args) => {
+    await ctx.db.patch(args.fileId, { name: args.name });
+  }
 });

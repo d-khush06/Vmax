@@ -65,14 +65,16 @@ export default function SyncedWhiteboard({ teamId }: SyncedWhiteboardProps) {
 
   if (!isLoaded) {
     return (
-      <div className="w-full h-full flex flex-col items-center justify-center text-teal-500 gap-4">
-        <div className="animate-spin w-8 h-8 border-2 border-teal-500 border-t-transparent rounded-full"></div>
-        <p className="text-sm font-medium">Loading Workspace Canvas...</p>
+      <div className="w-full h-full flex flex-col items-center justify-center gap-4 bg-[#0a0a0a]">
+        <div className="animate-spin w-10 h-10 border-2 border-teal-500/20 border-t-teal-400 rounded-full shadow-[0_0_15px_rgba(45,212,191,0.2)]"></div>
+        <p className="text-[13px] font-medium text-teal-100/70 tracking-wider">LOADING CANVAS...</p>
       </div>
     );
   }
 
   return (
-    <Tldraw store={store} />
+    <div className="w-full h-full" style={{ '--color-background': '#0a0a0a' } as any}>
+      <Tldraw store={store} />
+    </div>
   );
 }

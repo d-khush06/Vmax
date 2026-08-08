@@ -23,7 +23,7 @@ function SetupContent() {
   const [copied, setCopied] = useState(false);
 
   // We should query myTeams instead of myTeam here to check existence, but checking myTeam is also fine
-  const myTeams = useQuery(api.teams.getMyTeams, { clerkId: user?.id });
+  const myTeams = useQuery(api.teams.getMyTeams, { clerkId: user?.id || "" });
   const createTeam = useMutation(api.teams.create);
   const joinTeam = useMutation(api.teams.join);
 
@@ -50,10 +50,7 @@ function SetupContent() {
     try {
       const result = await createTeam({ 
         name: teamName,
-        clerkId: user?.id,
-        clerkName: user?.fullName || '',
-        clerkEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-        clerkAvatar: user?.imageUrl || ''
+        clerkId: user?.id || ''
       });
       setGeneratedJoinCode(result.joinCode);
       setMode('success');
@@ -73,10 +70,7 @@ function SetupContent() {
     try {
       await joinTeam({ 
         joinCode: joinCode.trim().toUpperCase(),
-        clerkId: user?.id,
-        clerkName: user?.fullName || '',
-        clerkEmail: user?.emailAddresses?.[0]?.emailAddress || '',
-        clerkAvatar: user?.imageUrl || ''
+        clerkId: user?.id || ''
       });
       router.push('/tasks');
     } catch (err: any) {

@@ -1,27 +1,23 @@
-import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
+import { v } from "convex/values";
 
 export const get = query({
   args: { teamId: v.id("teams") },
   handler: async (ctx, args) => {
     const whiteboard = await ctx.db
       .query("whiteboards")
-      .withIndex("by_team", (q) => q.eq("teamId", args.teamId))
+      .withIndex("by_teamId", (q) => q.eq("teamId", args.teamId))
       .first();
-    
     return whiteboard;
   },
 });
 
 export const save = mutation({
-  args: { 
-    teamId: v.id("teams"),
-    snapshot: v.string() 
-  },
+  args: { teamId: v.id("teams"), snapshot: v.string() },
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("whiteboards")
-      .withIndex("by_team", (q) => q.eq("teamId", args.teamId))
+      .withIndex("by_teamId", (q) => q.eq("teamId", args.teamId))
       .first();
 
     if (existing) {

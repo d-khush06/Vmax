@@ -150,8 +150,8 @@ export default function CalendarPage() {
 
   const events = eventsQuery ? eventsQuery.map((e: any) => ({
     ...e,
-    start: new Date(e.start_time),
-    end: new Date(e.end_time),
+    start: new Date(e.startTime),
+    end: new Date(e.endTime),
   })) : [];
 
   const handleAddEvent = async (title: string, startTime: string, endTime: string) => {

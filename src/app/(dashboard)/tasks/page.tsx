@@ -164,17 +164,17 @@ export default function KanbanPage() {
     let newColumnId = overId;
 
     const overTask = tasks.find((t: any) => t._id === overId);
-    if (overTask) newColumnId = overTask.column_id;
+    if (overTask) newColumnId = overTask.status;
 
     const activeTask = tasks.find((t: any) => t._id === taskId);
-    if (activeTask && activeTask.column_id !== newColumnId) {
-      await updateColumn({ taskId, columnId: newColumnId });
+    if (activeTask && activeTask.status !== newColumnId) {
+      await updateColumn({ taskId, status: newColumnId });
     }
   };
 
-  const handleAddTask = async (content: string, columnId: string) => {
+  const handleAddTask = async (title: string, status: string) => {
     if (!team || !user) throw new Error('No team or user found');
-    await addTask({ teamId: team._id, content, columnId, clerkId: user.id });
+    await addTask({ teamId: team._id, title, status, clerkId: user.id });
   };
 
   return (
@@ -206,7 +206,7 @@ export default function KanbanPage() {
         <div className="flex gap-4 flex-1 overflow-x-auto pb-4">
           <DndContext collisionDetection={closestCorners} onDragStart={(e) => setActiveId(e.active.id as string)} onDragEnd={handleDragEnd}>
             {defaultCols.map(col => {
-              const colTasks = tasks.filter((t: any) => t.column_id === col.id);
+              const colTasks = tasks.filter((t: any) => t.status === col.id);
               return (
                 <div key={col.id} className="w-[300px] flex-shrink-0 flex flex-col">
                   {/* Column header */}
@@ -246,7 +246,7 @@ export default function KanbanPage() {
             <DragOverlay>
               {activeId ? (
                 <div className="bg-white/10 p-4 rounded-xl border border-orange-500/50 text-sm text-white shadow-2xl scale-105 cursor-grabbing">
-                  {tasks.find((t: any) => t._id === activeId)?.content}
+                  {tasks.find((t: any) => t._id === activeId)?.title}
                 </div>
               ) : null}
             </DragOverlay>
