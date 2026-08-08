@@ -77,6 +77,10 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
           console.error('Failed to join room:', response.error);
           return;
         }
+        
+        if (response.peers) {
+          setPeers(response.peers);
+        }
 
         const device = new Device();
         deviceRef.current = device;
@@ -130,6 +134,17 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
           });
         });
       });
+    });
+
+    socket.on('newPeer', (peerInfo: any) => {
+      setPeers(prev => {
+        if (prev.find(p => p.id === peerInfo.id)) return prev;
+        return [...prev, peerInfo];
+      });
+    });
+
+    socket.on('peerClosed', ({ peerId }: any) => {
+      setPeers(prev => prev.filter(p => p.id !== peerId));
     });
 
     socket.on('newProducer', (producerInfo: any) => {

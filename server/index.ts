@@ -75,11 +75,19 @@ startMediasoup().then(() => {
 
     socket.on('joinRoom', async ({ roomId, name, avatarUrl }, callback) => {
       const room = await getOrCreateRoom(roomId);
-      room.addPeer(socket.id, name, avatarUrl);
+      const newPeer = room.addPeer(socket.id, name, avatarUrl);
       socket.join(roomId);
       
       const rtpCapabilities = room.router.rtpCapabilities;
-      callback({ rtpCapabilities });
+      
+      const existingPeers: any[] = [];
+      room.peers.forEach((p) => {
+        if (p.id !== socket.id) existingPeers.push({ id: p.id, name: p.name, avatarUrl: p.avatarUrl });
+      });
+
+      socket.to(roomId).emit('newPeer', { id: newPeer.id, name: newPeer.name, avatarUrl: newPeer.avatarUrl });
+      
+      callback({ rtpCapabilities, peers: existingPeers });
     });
 
     socket.on('createWebRtcTransport', async ({ roomId }, callback) => {
