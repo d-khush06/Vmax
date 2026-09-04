@@ -32,7 +32,7 @@ export const list = query({
 
         let replyToMessage = null;
         if (msg.replyToMessageId) {
-          const parent = await ctx.db.get(msg.replyToMessageId as any);
+          const parent = await ctx.db.get(msg.replyToMessageId);
           if (parent) {
             let parentUser = null;
             if (parent.clerkId) {
