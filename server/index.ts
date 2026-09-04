@@ -229,6 +229,12 @@ startMediasoup().then(() => {
         socket.to(roomId).emit('producerClosed', { producerId });
       }
     });
+
+    // Soundboard
+    socket.on('playSound', ({ roomId, soundId }) => {
+      // Broadcast to everyone else in the room
+      socket.to(roomId).emit('playSound', { peerId: socket.id, soundId });
+    });
   });
 
   const PORT = process.env.SOCKET_PORT || 3001;

@@ -66,6 +66,26 @@ export const leaveTeam = mutation({
   }
 });
 
+export const deleteTeam = mutation({
+  args: { teamId: v.id("teams"), clerkId: v.string() },
+  handler: async (ctx, args) => {
+    const team = await ctx.db.get(args.teamId);
+    if (!team) throw new Error("Team not found");
+    if (team.createdBy !== args.clerkId) throw new Error("Unauthorized");
+    
+    await ctx.db.delete(args.teamId);
+
+    const memberships = await ctx.db
+      .query("teamMembers")
+      .withIndex("by_teamId", (q) => q.eq("teamId", args.teamId))
+      .collect();
+      
+    for (const m of memberships) {
+      await ctx.db.delete(m._id);
+    }
+  }
+});
+
 export const getMyTeams = query({
   args: { clerkId: v.string() },
   handler: async (ctx, args) => {
@@ -100,5 +120,29 @@ export const getTeammates = query({
       })
     );
     return users.filter(u => u !== null);
+  }
+});
+
+export const updateTeam = mutation({
+  args: { 
+    teamId: v.id("teams"), 
+    clerkId: v.string(),
+    name: v.optional(v.string()),
+    imageStorageId: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    const team = await ctx.db.get(args.teamId);
+    if (!team) throw new Error("Team not found");
+    if (team.createdBy !== args.clerkId) throw new Error("Unauthorized: Only the owner can update the team");
+    
+    let imageUrl = team.imageUrl;
+    if (args.imageStorageId !== undefined) {
+      imageUrl = (await ctx.storage.getUrl(args.imageStorageId)) || undefined;
+    }
+
+    await ctx.db.patch(args.teamId, {
+      ...(args.name !== undefined ? { name: args.name } : {}),
+      ...(args.imageStorageId !== undefined ? { imageStorageId: args.imageStorageId, imageUrl } : {}),
+    });
   }
 });

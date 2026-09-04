@@ -5,8 +5,19 @@ import { io, Socket } from 'socket.io-client';
 import { Device } from 'mediasoup-client';
 import { useTeam } from '@/lib/team-context';
 import { useUser } from '@clerk/nextjs';
-import { Mic, MicOff, MonitorUp, PhoneOff, Video, VideoOff, Maximize, Minimize } from 'lucide-react';
+import { Mic, MicOff, MonitorUp, PhoneOff, Video, VideoOff, Maximize, Minimize, Music, Megaphone, Zap, Frown, PartyPopper, Bug, Drum, Bell, Ghost } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+
+const SOUNDS = [
+  { id: 'airhorn', name: 'Airhorn', icon: Megaphone, url: 'https://www.myinstants.com/media/sounds/mlg-airhorn.mp3' },
+  { id: 'vine-boom', name: 'Vine Boom', icon: Zap, url: 'https://www.myinstants.com/media/sounds/vine-boom.mp3' },
+  { id: 'bruh', name: 'Bruh', icon: Frown, url: 'https://www.myinstants.com/media/sounds/bruh.mp3' },
+  { id: 'tada', name: 'Tada', icon: PartyPopper, url: 'https://www.myinstants.com/media/sounds/tada.mp3' },
+  { id: 'sad-trombone', name: 'Sad Trombone', icon: Bug, url: 'https://www.myinstants.com/media/sounds/sadtrombone.swf.mp3' },
+  { id: 'ba-dum-tss', name: 'Ba Dum Tss', icon: Drum, url: 'https://www.myinstants.com/media/sounds/badumtss.mp3' },
+  { id: 'crickets', name: 'Crickets', icon: Ghost, url: 'https://www.myinstants.com/media/sounds/crickets.mp3' },
+  { id: 'ding', name: 'Ding', icon: Bell, url: 'https://www.myinstants.com/media/sounds/ding-sound-effect_2.mp3' },
+];
 
 export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: string }> }) {
   const [hasJoined, setHasJoined] = useState(false);
@@ -15,6 +26,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
   const [screenEnabled, setScreenEnabled] = useState(false);
   const [localMicTrack, setLocalMicTrack] = useState<any>(null);
   const [maximizedUser, setMaximizedUser] = useState<string | null>(null);
+  const [showSoundboard, setShowSoundboard] = useState(false);
   
   const { team } = useTeam();
   const { user } = useUser();
@@ -167,10 +179,30 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
       setPeers(prev => prev.filter(p => p.id !== peerId));
     });
 
+    socket.on('playSound', ({ soundId, peerId }) => {
+      const sound = SOUNDS.find(s => s.id === soundId);
+      if (sound) {
+        const audio = new Audio(sound.url);
+        audio.play().catch(console.error);
+      }
+    });
+
     return () => {
       socket.disconnect();
     };
   }, [hasJoined, roomId, username]);
+
+  const playSound = (soundId: string) => {
+    const sound = SOUNDS.find(s => s.id === soundId);
+    if (sound) {
+      const audio = new Audio(sound.url);
+      audio.play().catch(console.error);
+      if (socketRef.current) {
+        socketRef.current.emit('playSound', { roomId, soundId });
+      }
+    }
+    setShowSoundboard(false);
+  };
 
   const consumeProducer = async (producerInfo: any) => {
     const { producerId, peerId, peerName, peerAvatarUrl, appData } = producerInfo;
@@ -293,9 +325,9 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
 
   if (!hasJoined) {
     return (
-      <div className="h-full w-full flex items-center justify-center p-6 relative bg-[#030303]">
-        <div className="max-w-md w-full bg-[#0b120c] rounded-3xl p-10 border border-white/5 shadow-2xl text-center">
-          <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center mx-auto mb-6">
+      <div className="h-full w-full flex items-center justify-center p-6 relative bg-transparent">
+        <div className="max-w-md w-full bg-white/10 backdrop-blur-[60px] rounded-3xl p-10 border border-white/20 shadow-2xl text-center">
+          <div className="w-20 h-20 bg-green-500/20 border border-green-500/30 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.3)]">
             <Mic size={32} className="text-green-400" />
           </div>
           <h2 className="text-2xl font-bold text-white mb-2">Join Voice Room</h2>
@@ -312,7 +344,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
   }
 
   return (
-    <div className="h-full w-full flex flex-col p-4 bg-[#030303] relative overflow-hidden">
+    <div className="h-full w-full flex flex-col p-4 bg-transparent relative overflow-hidden">
       
       {/* Top Header */}
       <div className="flex justify-between items-center mb-4 px-2">
@@ -345,7 +377,7 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
       />
 
       {/* Control Bar */}
-      <div className="h-24 mt-4 bg-[#0b120c] rounded-3xl border border-white/5 flex items-center justify-center gap-4 shadow-xl">
+      <div className="h-24 mt-4 bg-white/10 backdrop-blur-3xl rounded-3xl border border-white/20 flex items-center justify-center gap-4 shadow-2xl">
         <button 
           onClick={toggleMic}
           className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${micEnabled ? 'bg-white/10 hover:bg-white/20 text-white' : 'bg-red-500/20 text-red-400 border border-red-500/30'}`}
@@ -367,6 +399,38 @@ export default function VoiceRoomPage({ params }: { params: Promise<{ roomId: st
         
         <div className="w-px h-8 bg-white/10 mx-2"></div>
         
+        <div className="relative">
+          <button 
+            onClick={() => setShowSoundboard(!showSoundboard)}
+            className={`w-12 h-12 rounded-xl flex items-center justify-center transition-all ${showSoundboard ? 'bg-indigo-500/30 text-indigo-400 border border-indigo-500/50 shadow-[0_0_15px_rgba(99,102,241,0.3)]' : 'bg-white/10 hover:bg-white/20 text-white'}`}
+          >
+            <Music size={20} />
+          </button>
+          
+          {showSoundboard && (
+            <div className="absolute bottom-full mb-4 left-1/2 -translate-x-1/2 w-64 bg-[#1c1c1e]/90 backdrop-blur-3xl rounded-2xl border border-white/15 shadow-2xl p-4 flex flex-col gap-2 z-50">
+              <div className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-1">Soundboard</div>
+              <div className="grid grid-cols-2 gap-2">
+                {SOUNDS.map(sound => {
+                  const Icon = sound.icon;
+                  return (
+                    <button 
+                      key={sound.id}
+                      onClick={() => playSound(sound.id)}
+                      className="p-3 bg-white/5 hover:bg-white/10 border border-white/10 hover:border-indigo-500/30 rounded-xl text-sm font-medium text-white transition-all text-left flex flex-col gap-2 group"
+                    >
+                      <Icon size={20} className="text-gray-400 group-hover:text-indigo-400 transition-colors" />
+                      <span>{sound.name}</span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        <div className="w-px h-8 bg-white/10 mx-2"></div>
+
         <button 
           onClick={leaveRoom}
           className="px-6 h-12 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl flex items-center gap-2 shadow-[0_0_15px_rgba(239,68,68,0.4)] transition-all"
@@ -505,7 +569,7 @@ function MediaGrid({
   tiles.push({
     id: 'local-video',
     content: (
-      <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/40 border border-white/5 group">
+      <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/20 backdrop-blur-md border border-white/10 group shadow-lg">
         {camEnabled && localCamTrack ? (
           <VideoPlayer track={localCamTrack} isLocal={true} />
         ) : (
@@ -528,7 +592,7 @@ function MediaGrid({
       id: 'local-screen',
       isScreen: true,
       content: (
-        <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/40 border border-white/5 group">
+        <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/40 border border-white/10 group shadow-lg">
           <VideoPlayer track={localScreenTrack} isLocal={true} isScreen={true} />
           <div className="absolute top-4 left-4 bg-green-500 text-white px-3 py-1 rounded-lg text-xs font-bold animate-pulse shadow-[0_0_10px_rgba(34,197,94,0.5)]">
             You are sharing your screen
@@ -546,7 +610,7 @@ function MediaGrid({
     tiles.push({
       id: `${peer.id}-video`,
       content: (
-        <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/40 border border-white/5 group">
+        <div className="relative w-full h-full rounded-2xl overflow-hidden bg-black/20 backdrop-blur-md border border-white/10 group shadow-lg">
           {peer.videoTrack ? (
             <VideoPlayer track={peer.videoTrack.track} />
           ) : (
@@ -588,7 +652,7 @@ function MediaGrid({
     const sideTiles = tiles.filter(t => t.id !== mainTile.id);
     
     return (
-      <div className="flex-1 min-h-0 bg-[#0b120c] rounded-3xl border border-white/5 overflow-hidden p-4 flex flex-col md:flex-row gap-4">
+      <div className="flex-1 min-h-0 bg-white/10 backdrop-blur-3xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden p-4 flex flex-col md:flex-row gap-4">
         <div className="flex-1 h-full min-w-0">
           {mainTile.content}
         </div>
@@ -605,11 +669,24 @@ function MediaGrid({
     );
   }
 
+  const count = tiles.length;
+  const cols = Math.ceil(Math.sqrt(count));
+  const rows = Math.ceil(count / cols);
+
   return (
-    <div className="flex-1 min-h-0 bg-[#0b120c] rounded-3xl border border-white/5 overflow-hidden p-4">
-      <div className="w-full h-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-fr">
+    <div className="flex-1 min-h-0 bg-white/10 backdrop-blur-3xl rounded-3xl border border-white/20 shadow-2xl overflow-hidden p-4">
+      <div 
+        style={{
+          display: 'grid',
+          gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`,
+          gridTemplateRows: `repeat(${rows}, minmax(0, 1fr))`,
+          gap: '16px',
+          width: '100%',
+          height: '100%'
+        }}
+      >
         {tiles.map(tile => (
-          <div key={tile.id} className={tile.isScreen ? "lg:col-span-2" : ""}>
+          <div key={tile.id} className="min-h-0 min-w-0">
             {tile.content}
           </div>
         ))}

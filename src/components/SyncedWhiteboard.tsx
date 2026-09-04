@@ -58,19 +58,25 @@ export default function SyncedWhiteboard({ teamId }: SyncedWhiteboardProps) {
 
     let timeout: NodeJS.Timeout;
     
-    const cleanup = store.listen((entry) => {
-      // Only save if there are actual document changes
-      if (entry.changes.added || entry.changes.updated || entry.changes.removed) {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          const snapshotString = JSON.stringify(getSnapshot(store));
-          // Only save if it actually changed to prevent infinite loops
-          if (snapshotString !== lastSavedSnapshot.current) {
-            lastSavedSnapshot.current = snapshotString;
-            saveWhiteboard({ teamId, snapshot: snapshotString }).catch(console.error);
-          }
-        }, 1000); // 1 second debounce
-      }
+    const cleanup = store.listen(() => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const snapshot = getSnapshot(store) as any;
+        
+        // Filter out ephemeral UI states (camera, cursor) so we don't save on every pan
+        const documentRecords = Object.fromEntries(
+          Object.entries(snapshot).filter(([id, record]: [string, any]) => 
+            !['camera', 'pointer', 'instance', 'instance_page_state', 'instance_presence'].includes(record.typeName)
+          )
+        );
+        
+        const snapshotString = JSON.stringify(documentRecords);
+        
+        if (snapshotString !== lastSavedSnapshot.current) {
+          lastSavedSnapshot.current = snapshotString;
+          saveWhiteboard({ teamId, snapshot: snapshotString }).catch(console.error);
+        }
+      }, 1500); 
     });
 
     return () => {
@@ -89,7 +95,7 @@ export default function SyncedWhiteboard({ teamId }: SyncedWhiteboardProps) {
   }
 
   return (
-    <div className="w-full h-full" style={{ '--color-background': '#0b120c' } as any}>
+    <div className="w-full h-full" style={{ '--color-background': 'transparent' } as any}>
       <Tldraw store={store} />
     </div>
   );

@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
-import { useQuery } from 'convex/react';
+import { useQuery, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 
 interface TeamContextType {
@@ -42,6 +42,18 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
       setActiveTeamId(savedTeamId);
     }
   }, []);
+
+  const syncUserMutation = useMutation(api.users.syncUser);
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      syncUserMutation({
+        clerkId: user.id,
+        full_name: user.fullName || undefined,
+        avatar_url: user.imageUrl || undefined,
+      });
+    }
+  }, [isLoaded, user, syncUserMutation]);
 
   const myTeams = useQuery(api.teams.getMyTeams, { clerkId: user?.id || "" });
   
@@ -91,7 +103,7 @@ export function TeamProvider({ children }: { children: React.ReactNode }) {
 
     // Set online users to everyone in team for now (Mock)
     if (teammates) {
-      setOnlineUsers(teammates.map((t: any) => t.id));
+      setOnlineUsers(teammates.map((t: any) => t.clerkId).filter(Boolean));
     }
   }, [isLoaded, user, myTeams, teammates, pathname, router]);
 

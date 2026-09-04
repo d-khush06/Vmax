@@ -1,23 +1,95 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Silkscreen&display=swap');
 @import "tailwindcss";
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
+  --color-coal: var(--coal);
+  --color-slate: var(--slate);
+  --color-slate-raised: var(--slate-raised);
+  --color-ore: var(--ore);
+  --color-ore-text: var(--ore-text);
+  --color-moss: var(--moss);
+  --color-redstone: var(--redstone);
+  --color-quartz: var(--quartz);
+  --color-quartz-dim: var(--quartz-dim);
+  --font-display: var(--font-display);
+  --font-body: var(--font-body);
+  --font-mono: var(--font-mono);
 }
 
-:root {
-  --background: #0b120c;
-  --foreground: #e5e7eb;
+:root, .theme-classic {
+  --coal: #f0f2f5;
+  --slate: #ffffff;
+  --slate-raised: #f8fafc;
+  --ore: #eab308;
+  --ore-text: #ca8a04;
+  --moss: #22c55e;
+  --redstone: #ef4444;
+  --quartz: #1e293b;
+  --quartz-dim: #64748b;
+  --font-display: 'Inter', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+.theme-voxel {
+  --coal: #1B1D21;
+  --slate: #2A2E35;
+  --slate-raised: #363B44;
+  --ore: #E3A23D;
+  --ore-text: #F0C070;
+  --moss: #6B9A5E;
+  --redstone: #C4453F;
+  --quartz: #C7D0D9;
+  --quartz-dim: #8A939E;
+  --font-display: 'Archivo Black', system-ui, sans-serif;
+  --font-body: 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--coal);
+  color: var(--quartz);
+  font-family: var(--font-body);
   margin: 0;
   padding: 0;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Hard corners in voxel mode, slightly rounded in classic */
+.theme-voxel * {
+  --radius-voxel: 4px;
+}
+.theme-classic * {
+  --radius-voxel: 8px;
+}
+
+/* Bevel Effects */
+.bevel {
+  border-top: 2px solid rgba(255, 255, 255, 0.15);
+  border-left: 2px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+  border-right: 2px solid rgba(0, 0, 0, 0.3);
+  border-radius: var(--radius-voxel, 4px);
+  background-color: var(--slate);
+}
+.bevel:hover {
+  background-color: var(--slate-raised);
+}
+
+.bevel-inset {
+  border-top: 2px solid rgba(0, 0, 0, 0.3);
+  border-left: 2px solid rgba(0, 0, 0, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.15);
+  border-right: 2px solid rgba(255, 255, 255, 0.15);
+  border-radius: var(--radius-voxel, 4px);
+  background-color: var(--coal);
+}
+
+/* Global focus ring */
+*:focus-visible {
+  outline: 2px solid var(--ore);
+  outline-offset: 2px;
 }
 
 /* Hide scrollbar utility class */
@@ -29,27 +101,32 @@ body {
   scrollbar-width: none;
 }
 
-/* Hack The Box Cyber Scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 ::-webkit-scrollbar-track {
-  background: #0b120c;
-  border-left: 1px solid rgba(34, 197, 94, 0.1);
+  background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-  background: rgba(34, 197, 94, 0.4);
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 197, 94, 0.8);
+  background: rgba(255, 255, 255, 0.25);
 }
 
-/* Hide Clerk Watermark */
+/* Hide Clerk Watermark and Dev Badge */
 .cl-watermark,
+.cl-internal-b3al4t,
+.cl-internal-1dauvpw,
+.cl-internal-1hp5nqm,
+.cl-devMode,
+div[style*="z-index: 99999"],
 a[href*="clerk.dev"],
-a[href*="clerk.com"] {
+a[href*="clerk.com"],
+.cl-footer > div:nth-child(2),
+.cl-footer > div:last-child:not(:first-child) {
   display: none !important;
   opacity: 0 !important;
   visibility: hidden !important;

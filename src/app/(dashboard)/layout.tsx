@@ -1,368 +1,115 @@
 "use client"
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageSquare, Folder, Calendar, Kanban, Monitor, Mic, Search, Bell, ChevronLeft, ChevronRight, Users, X, ChevronDown, Plus, LogOut, Check, Menu } from 'lucide-react';
-import Link from 'next/link';
-import { usePathname, useRouter } from 'next/navigation';
-import { useClerk, useUser } from "@clerk/nextjs";
-import { useMutation } from "convex/react";
-import { dark } from "@clerk/themes";
-import { api } from '../../../convex/_generated/api';
+import { WifiOff } from 'lucide-react';
+import { usePathname } from 'next/navigation';
 import { useTeam } from '@/lib/team-context';
 import ManageAccountModal from '@/components/ManageAccountModal';
+import { TradeWindow } from '@/components/TradeWindow';
+import { useNetworkStatus } from '@/lib/useNetworkStatus';
+import { MenuBar } from '@/components/MenuBar';
+import { Dock } from '@/components/Dock';
+import CreateWorkspaceModal from '@/components/CreateWorkspaceModal';
+import JoinWorkspaceModal from '@/components/JoinWorkspaceModal';
+import { CommandPalette } from '@/components/CommandPalette';
 
 export default function AuroraLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { team, myTeams, switchTeam, user, teammates, onlineUsers, loading } = useTeam();
+  const { loading, team } = useTeam();
+  const isOnline = useNetworkStatus();
 
-  const voiceRoomId = team?.name ? `${team.name.toLowerCase().replace(/\\s+/g, '-')}-voice` : 'general-voice';
-
-  const dockApps = [
-    { name: 'Chat', icon: MessageSquare, href: '/chat/general' },
-    { name: 'Voice', icon: Mic, href: `/voice/${voiceRoomId}` },
-    { name: 'Files', icon: Folder, href: '/files' },
-    { name: 'Calendar', icon: Calendar, href: '/calendar' },
-    { name: 'Tasks', icon: Kanban, href: '/tasks' },
-    { name: 'Whiteboard', icon: Monitor, href: '/whiteboard' },
-  ];
-
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
-  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isMembersOpen, setIsMembersOpen] = useState(false);
-  const [isWorkspaceDropdownOpen, setIsWorkspaceDropdownOpen] = useState(false);
-  const [isProfileDropdownOpen, setIsProfileDropdownOpen] = useState(false);
   const [showManageAccount, setShowManageAccount] = useState(false);
-  const { signOut } = useClerk();
+  const [showCreateWorkspace, setShowCreateWorkspace] = useState(false);
+  const [showJoinWorkspace, setShowJoinWorkspace] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   
-  const leaveTeamMutation = useMutation(api.teams.leaveTeam);
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
-  if (loading) {
-    return <div className="h-screen w-screen bg-[#030303]" />;
+  if (loading || !isClient) {
+    return <div className="h-screen w-screen bg-[#000000]" />;
   }
 
-  const handleSignOut = async () => {
-    // Handled by Clerk in the TeamContext or by routing
+  // Dynamic Background Logic based on Pathname
+  let ambientColors = {
+    primary: 'from-blue-600/40 via-indigo-600/10',
+    secondary: 'from-purple-600/40 via-fuchsia-600/10',
+    tertiary: 'from-cyan-500/40 via-blue-500/10'
   };
 
-  const handleLeaveTeam = async () => {
-    if (!team) return;
-    if (confirm(`Are you sure you want to leave ${team.name}?`)) {
-      try {
-        await leaveTeamMutation({ teamId: team._id, clerkId: user?.id });
-        setIsWorkspaceDropdownOpen(false);
-        // Page will automatically reload or context will push to /setup if 0 teams left
-      } catch (e: any) {
-        alert(e.message);
-      }
-    }
-  };
+  if (pathname.includes('/chat')) {
+    ambientColors = { primary: 'from-sky-600/40 via-blue-600/10', secondary: 'from-emerald-600/30 via-teal-600/10', tertiary: 'from-blue-500/40 via-sky-500/10' };
+  } else if (pathname.includes('/tasks')) {
+    ambientColors = { primary: 'from-violet-600/40 via-purple-600/10', secondary: 'from-fuchsia-600/30 via-pink-600/10', tertiary: 'from-purple-500/40 via-violet-500/10' };
+  } else if (pathname.includes('/voice')) {
+    ambientColors = { primary: 'from-orange-600/40 via-amber-600/10', secondary: 'from-yellow-600/30 via-orange-600/10', tertiary: 'from-amber-500/40 via-orange-500/10' };
+  }
 
   return (
-    <div className="relative flex h-screen w-full bg-[#0b120c] text-gray-200 overflow-hidden font-sans">
+    <div className="relative flex h-screen w-full bg-[#000000] text-gray-200 overflow-hidden font-sans">
       
-      {/* Ambient Glass Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#0b120c]">
-        <div className="absolute top-[10%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-green-500/5 blur-[120px]" />
-        <div className="absolute bottom-[10%] right-[20%] w-[40vw] h-[40vw] rounded-full bg-emerald-500/5 blur-[100px]" />
+      {!isOnline && (
+        <div className="absolute top-0 left-0 right-0 h-8 bg-red-600 text-white z-[100] flex items-center justify-center gap-2 text-xs font-bold tracking-widest uppercase shadow-md">
+          <WifiOff size={14} /> Offline Mode — Syncing Paused.
+        </div>
+      )}
+
+      {/* 1. Base Layer: Apple Mesh Background */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none transition-colors duration-1000">
+        <div className={`absolute top-[-10%] left-[-10%] w-[60vw] h-[60vw] rounded-full bg-gradient-radial ${ambientColors.primary} to-transparent blur-[120px] animate-pulse`} style={{ animationDuration: '8s' }} />
+        <div className={`absolute top-[40%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-gradient-radial ${ambientColors.secondary} to-transparent blur-[120px] animate-pulse`} style={{ animationDuration: '12s', animationDelay: '2s' }} />
+        <div className={`absolute top-[20%] right-[30%] w-[40vw] h-[40vw] rounded-full bg-gradient-radial ${ambientColors.tertiary} to-transparent blur-[100px] animate-pulse`} style={{ animationDuration: '10s', animationDelay: '4s' }} />
       </div>
 
-      {/* App Container */}
-      <div className="relative z-10 w-full h-full flex overflow-hidden pointer-events-auto bg-black/40 backdrop-blur-3xl shadow-[inset_0_0_100px_rgba(255,255,255,0.01)]">
+      {/* App Foreground Layer */}
+      <div className={`relative z-10 w-full h-full flex flex-col pointer-events-none ${!isOnline ? 'pt-8' : ''}`}>
+        
+        {/* Top Menu Bar */}
+        <div className="pointer-events-auto w-full">
+          <MenuBar 
+            onOpenManageAccount={() => setShowManageAccount(true)}
+            onOpenCreateWorkspace={() => setShowCreateWorkspace(true)}
+            onOpenJoinWorkspace={() => setShowJoinWorkspace(true)}
+          />
+        </div>
 
-          {/* Mobile Sidebar Backdrop */}
+        {/* Main Content Area */}
+        <div className="flex-1 relative z-0 overflow-hidden pointer-events-auto">
           <AnimatePresence>
-            {isMobileMenuOpen && (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 md:hidden"
-              />
-            )}
+            <motion.div 
+              key={pathname}
+              initial={{ opacity: 0, y: 5, scale: 0.995 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, y: -5, scale: 0.995 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="absolute inset-0 w-full h-full flex flex-col overflow-y-auto overflow-x-hidden"
+            >
+              {children}
+            </motion.div>
           </AnimatePresence>
-
-          {/* 2. Minimalist Left Sidebar */}
-          <motion.aside 
-            initial={false}
-            animate={{ width: isSidebarOpen ? 240 : 72, x: isMobileMenuOpen ? 0 : (typeof window !== 'undefined' && window.innerWidth < 768 ? -240 : 0) }}
-            className={`absolute md:relative z-50 md:z-30 h-full flex flex-col bg-white/[0.02] backdrop-blur-2xl border-r border-white/5 transition-all duration-300 ease-in-out flex-shrink-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
-          >
-            <div className="h-16 flex items-center px-3 shrink-0 relative">
-              <button 
-                onClick={() => setIsWorkspaceDropdownOpen(!isWorkspaceDropdownOpen)}
-                className={`w-full h-10 flex items-center ${isSidebarOpen ? 'justify-between px-3' : 'justify-center'} rounded-xl hover:bg-white/5 transition-colors cursor-pointer outline-none group`}
-              >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="w-6 h-6 rounded-md bg-green-500 flex items-center justify-center shrink-0 text-black font-bold text-[10px]">
-                     {team?.name?.substring(0, 2).toUpperCase() || 'VM'}
-                  </div>
-                  <AnimatePresence>
-                    {isSidebarOpen && (
-                      <motion.span 
-                        initial={{ opacity: 0, width: 0 }}
-                        animate={{ opacity: 1, width: 'auto' }}
-                        exit={{ opacity: 0, width: 0 }}
-                        className="font-bold text-sm tracking-wide whitespace-nowrap overflow-hidden text-gray-200 group-hover:text-white transition-colors"
-                      >
-                        {team?.name || 'Workspace'}
-                      </motion.span>
-                    )}
-                  </AnimatePresence>
-                </div>
-                {isSidebarOpen && (
-                   <ChevronDown size={14} className={`text-gray-500 transition-transform ${isWorkspaceDropdownOpen ? 'rotate-180' : ''}`} />
-                )}
-              </button>
-
-              <AnimatePresence>
-                {isWorkspaceDropdownOpen && (
-                  <>
-                    <div className="fixed inset-0 z-40" onClick={() => setIsWorkspaceDropdownOpen(false)} />
-                    <motion.div 
-                      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                      animate={{ opacity: 1, y: 0, scale: 1 }}
-                      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                      transition={{ duration: 0.15 }}
-                      className="absolute top-16 left-3 w-64 bg-[#222] border border-[#333] rounded-lg shadow-2xl overflow-hidden z-50 flex flex-col"
-                    >
-                      <div className="p-2">
-                        <div className="px-3 py-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">Workspaces</div>
-                        
-                        <div className="max-h-48 overflow-y-auto custom-scrollbar">
-                          {myTeams?.map((t: any) => (
-                            <button
-                              key={t._id}
-                              onClick={() => { switchTeam(t._id); setIsWorkspaceDropdownOpen(false); }}
-                              className="w-full flex items-center justify-between px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-left"
-                            >
-                              <div className="flex items-center gap-3 overflow-hidden">
-                                <div className="w-6 h-6 rounded-md bg-gradient-to-br from-gray-700 to-gray-800 flex items-center justify-center shrink-0 text-gray-300 font-bold text-[10px]">
-                                   {t.name.substring(0, 2).toUpperCase()}
-                                </div>
-                                <span className={`text-sm truncate ${team?._id === t._id ? 'text-white font-medium' : 'text-gray-400'}`}>
-                                  {t.name}
-                                </span>
-                              </div>
-                              {team?._id === t._id && <Check size={14} className="text-green-400 shrink-0" />}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="p-2 border-t border-white/5 space-y-1">
-                        <button
-                          onClick={() => { router.push('/setup?action=add'); setIsWorkspaceDropdownOpen(false); }}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-white/5 transition-colors text-gray-300 hover:text-white text-sm"
-                        >
-                          <Plus size={16} /> Create / Join Workspace
-                        </button>
-                        <button
-                          onClick={handleLeaveTeam}
-                          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg hover:bg-red-500/10 transition-colors text-red-400 hover:text-red-300 text-sm"
-                        >
-                          <LogOut size={16} /> Leave Workspace
-                        </button>
-                      </div>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="px-4 py-2 mt-4">
-               <AnimatePresence>
-                  {isSidebarOpen && (
-                    <motion.span 
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider block mb-2"
-                    >
-                      WORKSPACE
-                    </motion.span>
-                  )}
-               </AnimatePresence>
-            </div>
-
-            <div className="flex-1 flex flex-col gap-1 px-3 mt-4 overflow-y-auto hide-scrollbar">
-              {dockApps.map((app) => {
-                const isActive = pathname?.includes(app.href);
-                return (
-                  <Link key={app.name} href={app.href} className="relative group">
-                    <div className={`relative z-10 flex items-center gap-3 px-3 py-2 rounded-lg transition-all duration-300 border-l-2 ${isActive ? 'text-black bg-green-500 border-green-500 shadow-[0_0_15px_rgba(34,197,94,0.3)]' : 'text-gray-400 group-hover:bg-white/[0.03] group-hover:text-gray-200 border-transparent'}`}>
-                      <app.icon size={18} className="shrink-0" />
-                      <AnimatePresence>
-                        {isSidebarOpen && (
-                          <motion.div 
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: 'auto' }}
-                            exit={{ opacity: 0, width: 0 }}
-                            className="overflow-hidden whitespace-nowrap flex-1"
-                          >
-                            <span className={`text-sm ${isActive ? 'font-bold' : 'font-medium'}`}>{app.name}</span>
-                          </motion.div>
-                        )}
-                      </AnimatePresence>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-            
-            <div className="p-4 border-t border-white/5">
-              <button 
-                onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-                className="w-full flex items-center justify-center py-2 hover:bg-white/5 rounded-lg transition-colors text-gray-500 hover:text-gray-300"
-              >
-                {isSidebarOpen ? <ChevronLeft size={16} /> : <ChevronRight size={16} />}
-              </button>
-            </div>
-          </motion.aside>
-
-          {/* 3. Main Content Area */}
-          <div className="flex-1 flex flex-col relative z-20 overflow-hidden">
-            {/* Top Header */}
-            <header className="h-16 flex items-center justify-between px-4 md:px-6 shrink-0 z-10 border-b border-white/5 bg-white/[0.01] backdrop-blur-xl">
-              <div className="flex-1 flex items-center gap-3 md:gap-4">
-                <button
-                  onClick={() => setIsMobileMenuOpen(true)}
-                  className="md:hidden w-10 h-10 flex items-center justify-center rounded-lg hover:bg-white/5 text-gray-400 hover:text-white transition-colors"
-                >
-                  <Menu size={20} />
-                </button>
-                <div className="relative group w-full max-w-md hidden sm:block">
-                  <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-gray-300 transition-colors" />
-                  <input type="text" placeholder="Search..." className="w-full bg-white/[0.03] border border-white/10 rounded-lg py-1.5 pl-9 pr-4 text-sm text-gray-200 focus:outline-none focus:border-green-500/50 focus:bg-white/[0.05] transition-all placeholder-gray-500 shadow-inner" />
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <button 
-                  onClick={() => setIsMembersOpen(!isMembersOpen)}
-                  className={`w-8 h-8 flex items-center justify-center rounded-full transition-colors relative ${isMembersOpen ? 'bg-white/10 text-white' : 'text-gray-400 hover:bg-white/10 hover:text-gray-200'}`}
-                >
-                  <Users size={16} />
-                  <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-green-500 rounded-full" />
-                </button>
-                <div className="flex items-center gap-2 pl-3 border-l border-white/10 relative">
-                    <button 
-                      onClick={() => setIsProfileDropdownOpen(!isProfileDropdownOpen)}
-                      className="relative w-8 h-8 rounded-full border border-white/10 overflow-hidden hover:border-orange-500/50 transition-colors focus:outline-none focus:ring-2 focus:ring-orange-500/50"
-                    >
-                      <img src={user?.imageUrl || `https://i.pravatar.cc/150?u=${user?.id}`} className="w-full h-full object-cover" />
-                    </button>
-
-                    <AnimatePresence>
-                      {isProfileDropdownOpen && (
-                        <motion.div 
-                          initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                          transition={{ duration: 0.15 }}
-                          className="absolute right-0 top-full mt-3 w-64 bg-[#222] border border-[#333] rounded-lg shadow-2xl overflow-hidden z-50 origin-top-right"
-                        >
-                          <div className="p-4 border-b border-white/5 flex items-center gap-3">
-                            <img src={user?.imageUrl || `https://i.pravatar.cc/150?u=${user?.id}`} className="w-10 h-10 rounded-full border border-white/10" />
-                            <div className="overflow-hidden">
-                              <p className="text-sm font-semibold text-white truncate">{user?.fullName || user?.firstName}</p>
-                              <p className="text-xs text-gray-500 truncate">{user?.primaryEmailAddress?.emailAddress}</p>
-                            </div>
-                          </div>
-                          <div className="p-2 space-y-1">
-                            <button 
-                              onClick={() => { setIsProfileDropdownOpen(false); setShowManageAccount(true); }}
-                              className="w-full text-left px-3 py-2 text-sm font-medium text-gray-300 hover:text-white hover:bg-white/5 rounded-xl transition-colors"
-                            >
-                              Manage account
-                            </button>
-                            <button 
-                              onClick={() => signOut(() => router.push('/login'))}
-                              className="w-full text-left px-3 py-2 text-sm font-medium text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors"
-                            >
-                              Sign out
-                            </button>
-                          </div>
-                        </motion.div>
-                      )}
-                    </AnimatePresence>
-                </div>
-              </div>
-            </header>
-
-            {/* Custom Manage Account Modal */}
-            <AnimatePresence>
-              {showManageAccount && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 p-8">
-                  <ManageAccountModal onClose={() => setShowManageAccount(false)} />
-                </div>
-              )}
-            </AnimatePresence>
-
-            {/* Main Workspace */}
-            <main className="flex-1 overflow-hidden z-0 relative flex">
-               <div className="flex-1 relative">{children}</div>
-
-               {/* Right Members Sidebar */}
-               <AnimatePresence>
-                 {isMembersOpen && (
-                   <motion.div 
-                      initial={{ width: 0, opacity: 0 }}
-                      animate={{ width: 280, opacity: 1 }}
-                      exit={{ width: 0, opacity: 0 }}
-                      className="border-l border-white/5 bg-white/[0.02] backdrop-blur-2xl h-full flex flex-col shrink-0 overflow-hidden absolute right-0 top-0 bottom-0 z-40 lg:relative lg:z-auto"
-                   >
-                     <div className="p-4 border-b border-white/5">
-                        <h3 className="font-semibold text-white">Team Members</h3>
-                        <p className="text-xs text-gray-500 mt-1">Code: <span className="font-mono text-purple-400 select-all">{team?.join_code}</span></p>
-                     </div>
-                     <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                        <div>
-                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Online - {onlineUsers.length}</p>
-                          <div className="space-y-3">
-                            {teammates.filter(tm => onlineUsers.includes(tm.id)).map(tm => (
-                              <div key={tm.id} className="flex items-center gap-3">
-                                <div className="relative">
-                                  <img src={tm.avatar_url || `https://i.pravatar.cc/150?u=${tm.id}`} className="w-8 h-8 rounded-full border border-white/10" />
-                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-green-500 border-2 border-[#0a0a0c] rounded-full"></span>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-200 font-medium">{tm.full_name || 'Member'}</p>
-                                  <p className="text-[10px] text-gray-500 capitalize">{tm.role}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="pt-4 border-t border-white/5">
-                          <p className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider mb-3">Offline</p>
-                          <div className="space-y-3">
-                            {teammates.filter(tm => !onlineUsers.includes(tm.id)).map(tm => (
-                              <div key={tm.id} className="flex items-center gap-3 opacity-60 hover:opacity-100 transition-opacity">
-                                <div className="relative">
-                                  <img src={tm.avatar_url || `https://i.pravatar.cc/150?u=${tm.id}`} className="w-8 h-8 rounded-full border border-white/10 grayscale" />
-                                  <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-gray-500 border-2 border-[#0a0a0c] rounded-full"></span>
-                                </div>
-                                <div>
-                                  <p className="text-sm text-gray-200 font-medium">{tm.full_name || 'Member'}</p>
-                                  <p className="text-[10px] text-gray-500 capitalize">{tm.role}</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                     </div>
-                   </motion.div>
-                 )}
-               </AnimatePresence>
-            </main>
-          </div>
-          
+        </div>
+        
+        {/* Bottom Dock */}
+        <Dock />
       </div>
 
+      <AnimatePresence>
+        {showManageAccount && (
+          <div className="fixed inset-0 z-[1000] flex items-center justify-center bg-black/60 backdrop-blur-sm px-4 p-8">
+            <ManageAccountModal onClose={() => setShowManageAccount(false)} />
+          </div>
+        )}
+        {showCreateWorkspace && (
+          <CreateWorkspaceModal onClose={() => setShowCreateWorkspace(false)} />
+        )}
+        {showJoinWorkspace && (
+          <JoinWorkspaceModal onClose={() => setShowJoinWorkspace(false)} />
+        )}
+      </AnimatePresence>
+      <TradeWindow />
+      <CommandPalette />
     </div>
   );
 }

@@ -14,16 +14,14 @@ export default function WhiteboardPage() {
   const { team } = useTeam();
 
   return (
-    <div className="h-full w-full flex flex-col p-6 relative overflow-hidden bg-[#0b120c]">
-      {/* Dynamic Ambient Background Elements matching Chat */}
-      <div className="absolute top-0 right-1/4 w-[40vw] h-[40vw] bg-green-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse pointer-events-none"></div>
-      <div className="absolute bottom-0 left-1/4 w-[40vw] h-[40vw] bg-emerald-500/10 rounded-full mix-blend-screen filter blur-[100px] opacity-50 animate-pulse pointer-events-none" style={{ animationDelay: '2s' }}></div>
+    <div className="h-full w-full flex flex-col p-6 relative overflow-hidden bg-transparent">
+      {/* Removed local ambient background to allow global mesh to show through */}
 
       <motion.header 
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5, ease: "easeOut" }}
-        className="mb-6 px-5 py-4 flex items-center justify-between relative z-10 bg-white/[0.02] backdrop-blur-2xl border border-white/10 rounded-2xl shadow-[0_8px_32px_rgba(0,0,0,0.3)]"
+        className="mb-6 px-5 py-4 flex items-center justify-between relative z-10 bg-[#1c1c1e]/90 backdrop-blur-3xl border border-white/15 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8),_0_0_0_1px_rgba(255,255,255,0.05)_inset]"
       >
         <div>
           <h2 className="text-2xl font-bold text-gray-200 tracking-tight flex items-center gap-3">
@@ -50,7 +48,7 @@ export default function WhiteboardPage() {
         initial={{ opacity: 0, scale: 0.98, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1, ease: "easeOut" }}
-        className="flex-1 overflow-hidden bg-white/[0.02] backdrop-blur-3xl rounded-3xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.4)] relative z-10 group ring-1 ring-white/5"
+        className="flex-1 overflow-hidden bg-[#1c1c1e]/90 backdrop-blur-3xl rounded-3xl border border-white/15 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8),_0_0_0_1px_rgba(255,255,255,0.05)_inset] relative z-10 group"
       >
         <div className="absolute inset-0">
           {team ? (

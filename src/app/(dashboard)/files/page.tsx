@@ -110,11 +110,7 @@ export default function FilesPage() {
 
   return (
     <div className="h-full w-full flex flex-col p-6 relative overflow-hidden" onClick={() => setActiveMenu(null)}>
-      {/* Ambient Glass Background */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#121212]">
-        <div className="absolute top-[30%] left-[20%] w-[50vw] h-[50vw] rounded-full bg-green-500/10 blur-[130px]" />
-        <div className="absolute bottom-[20%] right-[30%] w-[40vw] h-[40vw] rounded-full bg-blue-500/10 blur-[120px]" />
-      </div>
+      {/* Removed local background to let global mesh show through */}
 
       {/* Toast Notification */}
       {toastMsg && (
@@ -124,7 +120,7 @@ export default function FilesPage() {
         </div>
       )}
 
-      <header className="mb-6 px-5 py-4 flex items-center justify-between relative z-10 bg-white/[0.02] backdrop-blur-xl border border-white/5 rounded-2xl shadow-lg">
+      <header className="mb-6 px-5 py-4 flex items-center justify-between relative z-10 bg-[#1c1c1e]/90 backdrop-blur-3xl border border-white/15 rounded-2xl shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8),_0_0_0_1px_rgba(255,255,255,0.05)_inset]">
         <div className="flex items-center gap-6">
           <div>
             <h2 className="text-2xl font-bold text-gray-200 tracking-tight flex items-center gap-3">
@@ -171,7 +167,7 @@ export default function FilesPage() {
         </div>
       </header>
 
-      <div className="flex-1 bg-white/[0.02] backdrop-blur-sm rounded-2xl border border-white/10 shadow-[0_20px_50px_rgba(0,0,0,0.5)] overflow-hidden flex flex-col relative z-10">
+      <div className="flex-1 bg-[#1c1c1e]/90 backdrop-blur-3xl rounded-2xl border border-white/15 shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8),_0_0_0_1px_rgba(255,255,255,0.05)_inset] overflow-hidden flex flex-col relative z-10">
         {/* Table Header */}
         <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-white/5 text-xs font-semibold text-gray-500 uppercase tracking-wider">
           <div className="col-span-6">Name</div>
@@ -236,7 +232,7 @@ export default function FilesPage() {
                   </button>
 
                   {activeMenu === file._id && (
-                    <div className="absolute top-10 right-0 w-36 bg-[#0b120c] border border-white/10 rounded-xl shadow-2xl py-1 z-50 overflow-hidden animate-in fade-in zoom-in-95">
+                    <div className="absolute top-10 right-0 w-36 bg-white/10 backdrop-blur-3xl border border-white/20 rounded-xl shadow-2xl py-1 z-50 overflow-hidden animate-in fade-in zoom-in-95">
                       <button 
                         onClick={() => { setEditingFile({ id: file._id, name: file.name }); setActiveMenu(null); }}
                         className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-white/5 hover:text-white flex items-center gap-2"

@@ -66,7 +66,7 @@ function AddEventModal({ onClose, onAdd }: AddEventModalProps) {
         initial={{ opacity: 0, scale: 0.95, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 16 }}
-        className="w-full max-w-md bg-[#0e0e10] border border-white/10 rounded-2xl shadow-2xl overflow-hidden"
+        className="w-full max-w-md bg-white/10 backdrop-blur-[60px] border border-white/20 rounded-3xl shadow-2xl overflow-hidden"
       >
         <div className="flex items-center justify-between px-6 py-4 border-b border-white/5">
           <h3 className="font-semibold text-white text-base">Add Calendar Event</h3>
@@ -90,7 +90,7 @@ function AddEventModal({ onClose, onAdd }: AddEventModalProps) {
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Sprint Planning Meeting"
               autoFocus
-              className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-4 py-3 text-sm text-gray-200 placeholder-gray-600 focus:outline-none focus:border-orange-500/50 focus:bg-white/[0.06] transition-all"
+              className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-[15px] text-white placeholder-white/30 focus:outline-none focus:border-orange-500/50 focus:bg-white/5 transition-all"
             />
           </div>
 
@@ -103,7 +103,7 @@ function AddEventModal({ onClose, onAdd }: AddEventModalProps) {
                 type="datetime-local"
                 value={startTime}
                 onChange={(e) => setStartTime(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-orange-500/50 transition-all [color-scheme:dark]"
+                className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-[15px] text-white focus:outline-none focus:border-orange-500/50 transition-all [color-scheme:dark]"
               />
             </div>
             <div>
@@ -114,7 +114,7 @@ function AddEventModal({ onClose, onAdd }: AddEventModalProps) {
                 type="datetime-local"
                 value={endTime}
                 onChange={(e) => setEndTime(e.target.value)}
-                className="w-full bg-white/[0.04] border border-white/10 rounded-xl px-3 py-2.5 text-sm text-gray-200 focus:outline-none focus:border-orange-500/50 transition-all [color-scheme:dark]"
+                className="w-full bg-black/20 border border-white/10 rounded-2xl px-4 py-3 text-[15px] text-white focus:outline-none focus:border-orange-500/50 transition-all [color-scheme:dark]"
               />
             </div>
           </div>
@@ -185,7 +185,7 @@ export default function CalendarPage() {
       {eventsQuery === undefined ? (
         <div className="flex-1 flex items-center justify-center text-gray-500">Loading Calendar...</div>
       ) : (
-        <div className="flex-1 overflow-hidden bg-[#0b120c] rounded-2xl border border-white/5 shadow-2xl p-5 relative">
+        <div className="flex-1 overflow-hidden bg-white/10 backdrop-blur-3xl rounded-3xl border border-white/20 shadow-2xl p-6 relative">
           <style dangerouslySetInnerHTML={{__html: `
             .rbc-calendar { font-family: 'Inter', sans-serif; color: #a1a1aa; border: none; background: transparent; }
             .rbc-toolbar { margin-bottom: 20px; }
